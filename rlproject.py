@@ -18,9 +18,9 @@ class Canvas(wx.Panel):
         },
     }
 
-    def __init__(self, parent, domain):
+    def __init__(self, parent, projection):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.domain = domain
+        self.projection = projection
         self.cursor_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
@@ -35,11 +35,11 @@ class Canvas(wx.Panel):
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        new_domain = self.domain.keyboard_event(KeyboardEvent(
+        new_projection = self.projection.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
-        if new_domain is not self.domain:
-            self.domain = new_domain
+        if new_projection is not self.projection:
+            self.projection = new_projection
             self.repaint_bitmap()
 
     def on_paint(self, event):
@@ -81,7 +81,7 @@ class Canvas(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.domain.get_strings():
+        for string in self.projection.target_domain.get_strings():
             if string.bold:
                 memdc.SetFont(font_bold)
             else:
@@ -90,7 +90,7 @@ class Canvas(wx.Panel):
             memdc.SetTextForeground(self.THEME["colors"].get(string.fg, self.THEME["colors"]["FOREGROUND"]))
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
-        x, y = self.domain.get_cursor()
+        x, y = self.projection.target_domain.get_cursor()
         self.cursor_rect = wx.Rect(x*char_width, y*char_height, char_width, char_height)
         self.reset_cursor()
         self.force_repaint_window()
@@ -103,44 +103,7 @@ class Canvas(wx.Panel):
         self.Refresh()
         self.Update()
 
-class StyledTextTerminalDomain:
-
-    """
-    In the styled text terminal domain
-
-    * a document is a list if styled text at a given (x, y)
-    * a cursor position is a position (x, y)
-    * keyboard events are accepted as input
-    """
-
-    def __init__(self, cursor_position=(4, 3)):
-        self.cursor_position = cursor_position
-
-    def get_cursor(self):
-        return self.cursor_position
-
-    def get_strings(self):
-        return [
-            StyledTerminalText(0, 0, "hello"),
-            StyledTerminalText(4, 1, "world!", bold=True),
-            StyledTerminalText(3, 3, "styled 1", fg="GREEN"),
-            StyledTerminalText(5, 4, "styled 2", bg="GREEN", fg="WHITE"),
-        ]
-
-    def keyboard_event(self, event):
-        x, y = self.cursor_position
-        if event.unicode_character == "j":
-            return StyledTextTerminalDomain((x, y+1))
-        elif event.unicode_character == "k":
-            return StyledTextTerminalDomain((x, y-1))
-        elif event.unicode_character == "h":
-            return StyledTextTerminalDomain((x-1, y))
-        elif event.unicode_character == "l":
-            return StyledTextTerminalDomain((x+1, y))
-        else:
-            return self
-
-class StyledTerminalText:
+class TerminalTextFragment:
 
     def __init__(self, x, y, text, bold=False, bg=None, fg=None):
         self.x = x
@@ -150,14 +113,162 @@ class StyledTerminalText:
         self.bg = bg
         self.fg = fg
 
+    def move(self, dy=0):
+        return TerminalTextFragment(
+            x=self.x,
+            y=self.y+dy,
+            text=self.text,
+            bold=self.bold,
+            bg=self.bg,
+            fg=self.fg,
+        )
+
+    def __repr__(self):
+        return f"TerminalTextFragment({repr(self.text)})"
+
+class TerminalText:
+
+    """
+    In the styled text terminal domain
+
+    * a document is a list if styled text at a given (x, y)
+    * a cursor position is a position (x, y)
+    * keyboard events are accepted as input
+    """
+
+    def __init__(self, cursor_position, strings):
+        self.cursor_position = cursor_position
+        self.strings = strings
+
+    def get_cursor(self):
+        return self.cursor_position
+
+    def get_strings(self):
+        return self.strings
+
 class KeyboardEvent:
 
     def __init__(self, unicode_character):
         self.unicode_character = unicode_character
 
+class String:
+
+    """
+    >>> String("hello", 0, 1).replace("1").string
+    '1ello'
+    """
+
+    def __init__(self, string, selection_start, selection_length):
+        self.string = string
+        self.selection_start = selection_start
+        self.selection_length = selection_length
+
+    def replace(self, text):
+        return String(
+            string="".join([
+                self.string[:self.selection_start],
+                text,
+                self.string[self.selection_start+self.selection_length:],
+            ]),
+            selection_start=self.selection_start+1,
+            selection_length=0
+        )
+
+class Projection:
+
+    def __init__(self, source_domain):
+        self.source_domain = source_domain
+        self.target_domain = self.project()
+
+class StringToTerminalText(Projection):
+
+    """
+    I project a String to a TerminalText.
+
+    I project keyboard events back to the String.
+
+    >>> projection = StringToTerminalText(String("hello", 1, 3))
+    >>> print("\\n".join(repr(x) for x in projection.target_domain.get_strings()))
+    TerminalTextFragment('h')
+    TerminalTextFragment('ell')
+    TerminalTextFragment('o')
+    """
+
+    def project(self):
+        string = self.source_domain.string
+        start = self.source_domain.selection_start
+        length = self.source_domain.selection_length
+        return TerminalText(
+            strings=[
+                TerminalTextFragment(
+                    text=string[:start],
+                    y=0,
+                    x=0
+                ),
+                TerminalTextFragment(
+                    text=string[start:start+length],
+                    y=0,
+                    x=start,
+                    bg="YELLOW"
+                ),
+                TerminalTextFragment(
+                    text=string[start+length:],
+                    y=0,
+                    x=start+length
+                ),
+            ],
+            cursor_position=(start, 0)
+        )
+
+    def keyboard_event(self, event):
+        if event.unicode_character:
+            return StringToTerminalText(
+                self.source_domain.replace(event.unicode_character)
+            )
+        else:
+            return self
+
+class Editor:
+
+    def __init__(self, terminal_text_projection, event):
+        self.terminal_text_projection = terminal_text_projection
+        self.event = event
+
+    def keyboard_event(self, event):
+        return Editor(
+            terminal_text_projection=self.terminal_text_projection.keyboard_event(event),
+            event=event
+        )
+
+class EditorToTerminalText(Projection):
+
+    def project(self):
+        (x, y) = self.source_domain.terminal_text_projection.target_domain.get_cursor()
+        return TerminalText(
+            strings=[
+                TerminalTextFragment(text=f"STATUS: {repr(self.source_domain.event.unicode_character)}", x=0, y=0, bg="MAGENTA", fg="WHITE")
+            ]+[x.move(dy=1) for x in self.source_domain.terminal_text_projection.target_domain.strings],
+            cursor_position=(x, y+1)
+        )
+
+    def keyboard_event(self, event):
+        return EditorToTerminalText(self.source_domain.keyboard_event(event))
+
 if __name__ == "__main__":
-    app = wx.App()
-    main_frame = wx.Frame(None)
-    Canvas(main_frame, StyledTextTerminalDomain())
-    main_frame.Show()
-    app.MainLoop()
+    import sys
+    if "--test" in sys.argv[1:]:
+        import doctest
+        if doctest.testmod().failed > 0:
+            sys.exit(1)
+        print("ok")
+    else:
+        app = wx.App()
+        main_frame = wx.Frame(None)
+        Canvas(main_frame, EditorToTerminalText(
+            Editor(
+                StringToTerminalText(String("hello world", 2, 2)),
+                KeyboardEvent(unicode_character=None)
+            )
+        ))
+        main_frame.Show()
+        app.MainLoop()
