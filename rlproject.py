@@ -223,32 +223,29 @@ class StringToTerminalText(TerminalText):
         else:
             return self
 
-class Editor:
+class Editor(TerminalText):
 
-    def __init__(self, terminal_text_projection, event):
-        self.terminal_text_projection = terminal_text_projection
-        self.event = event
-
-    def keyboard_event(self, event):
-        return Editor(
-            terminal_text_projection=self.terminal_text_projection.keyboard_event(event),
-            event=event
-        )
-
-class EditorToTerminalText(TerminalText):
-
-    def __init__(self, editor):
-        self.editor = editor
-        (x, y) = self.editor.terminal_text_projection.get_cursor()
+    def __init__(self, terminal_text, unicode_character=None):
+        self.terminal_text = terminal_text
+        (x, y) = self.terminal_text.get_cursor()
         TerminalText.__init__(self,
             strings=[
-                TerminalTextFragment(text=f"STATUS: {repr(self.editor.event.unicode_character)}", x=0, y=0, bg="MAGENTA", fg="WHITE")
-            ]+[x.move(dy=1) for x in self.editor.terminal_text_projection.strings],
+                TerminalTextFragment(
+                    text=f"STATUS: {repr(unicode_character)}",
+                    x=0,
+                    y=0,
+                    bg="MAGENTA",
+                    fg="WHITE"
+                )
+            ]+[x.move(dy=1) for x in self.terminal_text.strings],
             cursor_position=(x, y+1)
         )
 
     def keyboard_event(self, event):
-        return EditorToTerminalText(self.editor.keyboard_event(event))
+        return Editor(
+            terminal_text=self.terminal_text.keyboard_event(event),
+            unicode_character=event.unicode_character
+        )
 
 if __name__ == "__main__":
     import sys
@@ -260,11 +257,11 @@ if __name__ == "__main__":
     else:
         app = wx.App()
         main_frame = wx.Frame(None)
-        Canvas(main_frame, EditorToTerminalText(
+        Canvas(
+            main_frame,
             Editor(
-                StringToTerminalText(String("hello world", 2, 2)),
-                KeyboardEvent(unicode_character=None)
+                StringToTerminalText(String("hello world", 2, 2))
             )
-        ))
+        )
         main_frame.Show()
         app.MainLoop()
