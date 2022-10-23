@@ -260,7 +260,9 @@ if __name__ == "__main__":
         Canvas(
             main_frame,
             Editor(
-                StringToTerminalText(String("hello world", 2, 2))
+                StringToTerminalText(
+                    String("hello world", 2, 2)
+                )
             )
         )
         main_frame.Show()
