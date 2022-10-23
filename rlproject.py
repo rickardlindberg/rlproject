@@ -18,9 +18,9 @@ class Canvas(wx.Panel):
         },
     }
 
-    def __init__(self, parent, projection):
+    def __init__(self, parent, document):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.projection = projection
+        self.document = document
         self.cursor_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
@@ -35,11 +35,11 @@ class Canvas(wx.Panel):
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        new_projection = self.projection.keyboard_event(KeyboardEvent(
+        new_document = self.document.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
-        if new_projection is not self.projection:
-            self.projection = new_projection
+        if new_document != self.document:
+            self.document = new_document
             self.repaint_bitmap()
 
     def on_paint(self, event):
@@ -81,7 +81,7 @@ class Canvas(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.projection.target_domain.get_strings():
+        for string in self.document.get_strings():
             if string.bold:
                 memdc.SetFont(font_bold)
             else:
@@ -90,7 +90,7 @@ class Canvas(wx.Panel):
             memdc.SetTextForeground(self.THEME["colors"].get(string.fg, self.THEME["colors"]["FOREGROUND"]))
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
-        x, y = self.projection.target_domain.get_cursor()
+        x, y = self.document.get_cursor()
         self.cursor_rect = wx.Rect(x*char_width, y*char_height, char_width, char_height)
         self.reset_cursor()
         self.force_repaint_window()
@@ -102,6 +102,26 @@ class Canvas(wx.Panel):
     def force_repaint_window(self):
         self.Refresh()
         self.Update()
+
+class TerminalText:
+
+    """
+    In the styled text terminal domain
+
+    * a document is a list if styled text at a given (x, y)
+    * a cursor position is a position (x, y)
+    * keyboard events are accepted as input
+    """
+
+    def __init__(self, cursor_position, strings):
+        self.cursor_position = cursor_position
+        self.strings = strings
+
+    def get_cursor(self):
+        return self.cursor_position
+
+    def get_strings(self):
+        return self.strings
 
 class TerminalTextFragment:
 
@@ -125,26 +145,6 @@ class TerminalTextFragment:
 
     def __repr__(self):
         return f"TerminalTextFragment({repr(self.text)})"
-
-class TerminalText:
-
-    """
-    In the styled text terminal domain
-
-    * a document is a list if styled text at a given (x, y)
-    * a cursor position is a position (x, y)
-    * keyboard events are accepted as input
-    """
-
-    def __init__(self, cursor_position, strings):
-        self.cursor_position = cursor_position
-        self.strings = strings
-
-    def get_cursor(self):
-        return self.cursor_position
-
-    def get_strings(self):
-        return self.strings
 
 class KeyboardEvent:
 
@@ -174,31 +174,26 @@ class String:
             selection_length=0
         )
 
-class Projection:
-
-    def __init__(self, source_domain):
-        self.source_domain = source_domain
-        self.target_domain = self.project()
-
-class StringToTerminalText(Projection):
+class StringToTerminalText(TerminalText):
 
     """
     I project a String to a TerminalText.
 
     I project keyboard events back to the String.
 
-    >>> projection = StringToTerminalText(String("hello", 1, 3))
-    >>> print("\\n".join(repr(x) for x in projection.target_domain.get_strings()))
+    >>> terminal_text = StringToTerminalText(String("hello", 1, 3))
+    >>> print("\\n".join(repr(x) for x in terminal_text.get_strings()))
     TerminalTextFragment('h')
     TerminalTextFragment('ell')
     TerminalTextFragment('o')
     """
 
-    def project(self):
-        string = self.source_domain.string
-        start = self.source_domain.selection_start
-        length = self.source_domain.selection_length
-        return TerminalText(
+    def __init__(self, string):
+        self.string = string
+        string = self.string.string
+        start = self.string.selection_start
+        length = self.string.selection_length
+        TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
                     text=string[:start],
@@ -223,7 +218,7 @@ class StringToTerminalText(Projection):
     def keyboard_event(self, event):
         if event.unicode_character:
             return StringToTerminalText(
-                self.source_domain.replace(event.unicode_character)
+                self.string.replace(event.unicode_character)
             )
         else:
             return self
@@ -240,19 +235,20 @@ class Editor:
             event=event
         )
 
-class EditorToTerminalText(Projection):
+class EditorToTerminalText(TerminalText):
 
-    def project(self):
-        (x, y) = self.source_domain.terminal_text_projection.target_domain.get_cursor()
-        return TerminalText(
+    def __init__(self, editor):
+        self.editor = editor
+        (x, y) = self.editor.terminal_text_projection.get_cursor()
+        TerminalText.__init__(self,
             strings=[
-                TerminalTextFragment(text=f"STATUS: {repr(self.source_domain.event.unicode_character)}", x=0, y=0, bg="MAGENTA", fg="WHITE")
-            ]+[x.move(dy=1) for x in self.source_domain.terminal_text_projection.target_domain.strings],
+                TerminalTextFragment(text=f"STATUS: {repr(self.editor.event.unicode_character)}", x=0, y=0, bg="MAGENTA", fg="WHITE")
+            ]+[x.move(dy=1) for x in self.editor.terminal_text_projection.strings],
             cursor_position=(x, y+1)
         )
 
     def keyboard_event(self, event):
-        return EditorToTerminalText(self.source_domain.keyboard_event(event))
+        return EditorToTerminalText(self.editor.keyboard_event(event))
 
 if __name__ == "__main__":
     import sys

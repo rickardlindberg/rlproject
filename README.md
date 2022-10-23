@@ -44,3 +44,32 @@ https://github.com/projectured/projectured/wiki:
 * Does a backend need a specific projection domain?
 
     * SDL backend needs WIDGET/COMPOSITE?
+
+---
+
+https://www.projectit.org/010_Intro/010_Projectional_Editing
+
+> The essential characteristic of projectional editing is that the user
+> manipulates the Abstract Syntax Tree (AST) directly. In contrast, the
+> traditional manner of editing is that a user manipulates a text-string, which
+> is then (re)parsed into a (changed) AST.
+
+> 1. The model/AST is mapped to a visual presentation (the projection).
+> 2. The projection is shown to the user.
+> 3. The user performs an action on the projection.
+> 4. The action on the projection is mapped to an action on the model/AST.
+> 5. (or 1 again) The changed model/AST is (re)mapped to a visual representation.
+
+https://www.projectit.org/030_Developing_a_Language/030_API_Level/020_Writing_Projections
+
+---
+
+https://github.com/tehwalris/forest
+
+https://www.youtube.com/watch?v=ze_nJlKkckg
+
+* Multiple cursors
+
+---
+
+* You always edit the bottom most document
