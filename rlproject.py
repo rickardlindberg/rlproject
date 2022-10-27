@@ -1,4 +1,5 @@
 import wx
+from collections import namedtuple
 
 class Canvas(wx.Panel):
 
@@ -123,28 +124,14 @@ class TerminalText:
     def get_strings(self):
         return self.strings
 
-class TerminalTextFragment:
-
-    def __init__(self, x, y, text, bold=False, bg=None, fg=None):
-        self.x = x
-        self.y = y
-        self.text = text
-        self.bold = bold
-        self.bg = bg
-        self.fg = fg
+class TerminalTextFragment(namedtuple(
+    "TerminalTextFragment",
+    ["x", "y", "text", "bold", "bg", "fg"],
+    defaults=[None, None, None]
+)):
 
     def move(self, dy=0):
-        return TerminalTextFragment(
-            x=self.x,
-            y=self.y+dy,
-            text=self.text,
-            bold=self.bold,
-            bg=self.bg,
-            fg=self.fg,
-        )
-
-    def __repr__(self):
-        return f"TerminalTextFragment({repr(self.text)})"
+        return self._replace(y=self.y+dy)
 
 class KeyboardEvent:
 
@@ -183,9 +170,9 @@ class StringToTerminalText(TerminalText):
 
     >>> terminal_text = StringToTerminalText(String("hello", 1, 3))
     >>> print("\\n".join(repr(x) for x in terminal_text.get_strings()))
-    TerminalTextFragment('h')
-    TerminalTextFragment('ell')
-    TerminalTextFragment('o')
+    TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
+    TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
+    TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
     """
 
     def __init__(self, string):
