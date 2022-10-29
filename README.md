@@ -73,3 +73,19 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
 ---
 
 * You always edit the bottom most document
+
+---
+
+* Where to do convert keystrokes to actions?
+* Multiple cursors?
+
+* Operation 1: replace multiple words
+    * Move cursor to word
+    * `*` to select word to create multiple curors
+    * `c` to enter insert mode and do the replacement
+    * `Esc` to exit
+
+* Operation 2: filter lines and operate on those only
+    * Enter filter `test`
+        * Show only lines matching filters
+    * Cursor and edit operations should only work on filtered lines
