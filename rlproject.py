@@ -202,7 +202,7 @@ class StringToTerminalText(TerminalText):
         )
 
     def keyboard_event(self, event):
-        if event.unicode_character:
+        if event.unicode_character and ord(event.unicode_character) >= 32:
             return StringToTerminalText(
                 self.string.replace(event.unicode_character)
             )
