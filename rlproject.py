@@ -47,9 +47,8 @@ class Canvas(wx.Panel):
         dc = wx.AutoBufferedPaintDC(self)
         dc.DrawBitmap(self.bitmap, 0, 0, True)
         if self.show_cursor:
-            r, g, b = self.THEME["colors"]["FOREGROUND"]
-            dc.SetPen(wx.Pen((r, g, b), 1))
-            dc.SetBrush(wx.Brush((r, g, b, 150)))
+            dc.SetPen(wx.Pen((0, 0, 0), 0))
+            dc.SetBrush(wx.Brush(self.THEME["colors"]["FOREGROUND"]))
             dc.DrawRectangle(self.cursor_rect)
 
     def on_timer(self, event):
@@ -92,7 +91,7 @@ class Canvas(wx.Panel):
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
         x, y = self.document.get_cursor()
-        self.cursor_rect = wx.Rect(x*char_width, y*char_height, char_width, char_height)
+        self.cursor_rect = wx.Rect(x*char_width-1, y*char_height, 3, char_height)
         self.reset_cursor()
         self.force_repaint_window()
 
