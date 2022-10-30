@@ -216,11 +216,11 @@ class StringToTerminalText(TerminalText):
         )
 
     def keyboard_event(self, event):
-        if event.unicode_character == "\x06":
+        if event.unicode_character == "\x06": # Ctrl-F
             return StringToTerminalText(
                 self.string.move_cursor_forward()
             )
-        elif event.unicode_character == "\x02":
+        elif event.unicode_character == "\x02": # Ctrl-B
             return StringToTerminalText(
                 self.string.move_cursor_back()
             )
