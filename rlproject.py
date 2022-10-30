@@ -160,6 +160,20 @@ class String:
             selection_length=0
         )
 
+    def move_cursor_back(self):
+        return String(
+            string=self.string,
+            selection_start=self.selection_start-1,
+            selection_length=0
+        )
+
+    def move_cursor_forward(self):
+        return String(
+            string=self.string,
+            selection_start=self.selection_start+1,
+            selection_length=0
+        )
+
 class StringToTerminalText(TerminalText):
 
     """
@@ -202,7 +216,15 @@ class StringToTerminalText(TerminalText):
         )
 
     def keyboard_event(self, event):
-        if event.unicode_character and ord(event.unicode_character) >= 32:
+        if event.unicode_character == "\x06":
+            return StringToTerminalText(
+                self.string.move_cursor_forward()
+            )
+        elif event.unicode_character == "\x02":
+            return StringToTerminalText(
+                self.string.move_cursor_back()
+            )
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
             return StringToTerminalText(
                 self.string.replace(event.unicode_character)
             )
