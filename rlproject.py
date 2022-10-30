@@ -139,42 +139,42 @@ class KeyboardEvent:
 
 class String(namedtuple(
     "String",
-    ["string", "selection"]
+    ["string", "selections"]
 )):
 
     """
-    >>> String("hello", StringSelection(0, 1)).replace("1").string
+    >>> String("hello", [StringSelection(0, 1)]).replace("1").string
     '1ello'
     """
 
     def replace(self, text):
         return String(
             string="".join([
-                self.string[:self.selection.start],
+                self.string[:self.selections[-1].start],
                 text,
-                self.string[self.selection.start+self.selection.length:],
+                self.string[self.selections[-1].start+self.selections[-1].length:],
             ]),
-            selection=self.selection.move_forward()
+            selections=[self.selections[-1].move_forward()]
         )
 
     def move_cursor_back(self):
         return String(
             string=self.string,
-            selection=self.selection.move_back()
+            selections=[self.selections[-1].move_back()]
         )
 
     def move_cursor_forward(self):
         return String(
             string=self.string,
-            selection=self.selection.move_forward()
+            selections=[self.selections[-1].move_forward()]
         )
 
     def select_next_word(self):
         """
-        >>> String("hello there", StringSelection(0, 0)).select_next_word()
-        String(string='hello there', selection=StringSelection(start=0, length=5))
+        >>> String("hello there", [StringSelection(0, 0)]).select_next_word()
+        String(string='hello there', selections=[StringSelection(start=0, length=5)])
         """
-        return self._replace(selection=self.selection._replace(length=5))
+        return self._replace(selections=[self.selections[-1]._replace(length=5)])
 
 class StringSelection(namedtuple(
     "StringSelection",
@@ -194,7 +194,7 @@ class StringToTerminalText(TerminalText):
 
     I project keyboard events back to the String.
 
-    >>> terminal_text = StringToTerminalText(String("hello", StringSelection(1, 3)))
+    >>> terminal_text = StringToTerminalText(String("hello", [StringSelection(1, 3)]))
     >>> print("\\n".join(repr(x) for x in terminal_text.get_strings()))
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
@@ -204,8 +204,8 @@ class StringToTerminalText(TerminalText):
     def __init__(self, string):
         self.string = string
         string = self.string.string
-        start = self.string.selection.start
-        length = self.string.selection.length
+        start = self.string.selections[-1].start
+        length = self.string.selections[-1].length
         TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
@@ -286,7 +286,7 @@ if __name__ == "__main__":
             main_frame,
             Editor(
                 StringToTerminalText(
-                    String("hello world, hello world!", StringSelection(0, 0))
+                    String("hello world, hello world!", [StringSelection(0, 0)])
                 )
             )
         )
