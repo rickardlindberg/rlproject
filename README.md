@@ -78,10 +78,11 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
 
 * Where to do convert keystrokes to actions?
 * Multiple cursors?
+* If editor is modal or not should only be reflected in key bindings
 
 * Operation 1: replace multiple words
     * Move cursor to word
-    * `*` to select word to create multiple curors
+    * `*` to select word to create multiple cursors
     * `c` to enter insert mode and do the replacement
     * `Esc` to exit
 
