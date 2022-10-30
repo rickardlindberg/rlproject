@@ -137,17 +137,15 @@ class KeyboardEvent:
     def __init__(self, unicode_character):
         self.unicode_character = unicode_character
 
-class String:
+class String(namedtuple(
+    "String",
+    ["string", "selection_start", "selection_length"]
+)):
 
     """
     >>> String("hello", 0, 1).replace("1").string
     '1ello'
     """
-
-    def __init__(self, string, selection_start, selection_length):
-        self.string = string
-        self.selection_start = selection_start
-        self.selection_length = selection_length
 
     def replace(self, text):
         return String(
@@ -173,6 +171,13 @@ class String:
             selection_start=self.selection_start+1,
             selection_length=0
         )
+
+    def select_next_word(self):
+        """
+        >>> String("hello there", 0, 0).select_next_word()
+        String(string='hello there', selection_start=0, selection_length=5)
+        """
+        return self._replace(selection_length=5)
 
 class StringToTerminalText(TerminalText):
 
@@ -224,6 +229,10 @@ class StringToTerminalText(TerminalText):
             return StringToTerminalText(
                 self.string.move_cursor_back()
             )
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            return StringToTerminalText(
+                self.string.select_next_word()
+            )
         elif event.unicode_character and ord(event.unicode_character) >= 32:
             return StringToTerminalText(
                 self.string.replace(event.unicode_character)
@@ -269,7 +278,7 @@ if __name__ == "__main__":
             main_frame,
             Editor(
                 StringToTerminalText(
-                    String("hello world", 2, 2)
+                    String("hello world, hello world!", 0, 0)
                 )
             )
         )
