@@ -139,45 +139,53 @@ class KeyboardEvent:
 
 class String(namedtuple(
     "String",
-    ["string", "selection_start", "selection_length"]
+    ["string", "selection"]
 )):
 
     """
-    >>> String("hello", 0, 1).replace("1").string
+    >>> String("hello", StringSelection(0, 1)).replace("1").string
     '1ello'
     """
 
     def replace(self, text):
         return String(
             string="".join([
-                self.string[:self.selection_start],
+                self.string[:self.selection.start],
                 text,
-                self.string[self.selection_start+self.selection_length:],
+                self.string[self.selection.start+self.selection.length:],
             ]),
-            selection_start=self.selection_start+1,
-            selection_length=0
+            selection=self.selection.move_forward()
         )
 
     def move_cursor_back(self):
         return String(
             string=self.string,
-            selection_start=self.selection_start-1,
-            selection_length=0
+            selection=self.selection.move_back()
         )
 
     def move_cursor_forward(self):
         return String(
             string=self.string,
-            selection_start=self.selection_start+1,
-            selection_length=0
+            selection=self.selection.move_forward()
         )
 
     def select_next_word(self):
         """
-        >>> String("hello there", 0, 0).select_next_word()
-        String(string='hello there', selection_start=0, selection_length=5)
+        >>> String("hello there", StringSelection(0, 0)).select_next_word()
+        String(string='hello there', selection=StringSelection(start=0, length=5))
         """
-        return self._replace(selection_length=5)
+        return self._replace(selection=self.selection._replace(length=5))
+
+class StringSelection(namedtuple(
+    "StringSelection",
+    ["start", "length"]
+)):
+
+    def move_back(self):
+        return self._replace(start=self.start-1, length=0)
+
+    def move_forward(self):
+        return self._replace(start=self.start+1, length=0)
 
 class StringToTerminalText(TerminalText):
 
@@ -186,7 +194,7 @@ class StringToTerminalText(TerminalText):
 
     I project keyboard events back to the String.
 
-    >>> terminal_text = StringToTerminalText(String("hello", 1, 3))
+    >>> terminal_text = StringToTerminalText(String("hello", StringSelection(1, 3)))
     >>> print("\\n".join(repr(x) for x in terminal_text.get_strings()))
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
@@ -196,8 +204,8 @@ class StringToTerminalText(TerminalText):
     def __init__(self, string):
         self.string = string
         string = self.string.string
-        start = self.string.selection_start
-        length = self.string.selection_length
+        start = self.string.selection.start
+        length = self.string.selection.length
         TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
@@ -278,7 +286,7 @@ if __name__ == "__main__":
             main_frame,
             Editor(
                 StringToTerminalText(
-                    String("hello world, hello world!", 0, 0)
+                    String("hello world, hello world!", StringSelection(0, 0))
                 )
             )
         )
