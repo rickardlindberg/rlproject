@@ -171,17 +171,20 @@ class String(
         >>> String("hello there", [StringSelection(0, 0)]).select_next_word()
         String(string='hello there', selections=[StringSelection(start=0, length=5)])
         """
-        return self._replace(selections=[self.selections[-1]._replace(length=5)])
+        if self.selections[-1].length > 0:
+            return self._replace(selections=self.selections+[self.selections[-1].move_forward(self.selections[-1].length)])
+        else:
+            return self._replace(selections=[self.selections[-1]._replace(length=5)])
 
 class StringSelection(
     namedtuple("StringSelection", "start length")
 ):
 
-    def move_back(self):
-        return self._replace(start=self.start-1, length=0)
+    def move_back(self, steps=1):
+        return self._replace(start=self.start-steps, length=0)
 
-    def move_forward(self):
-        return self._replace(start=self.start+1, length=0)
+    def move_forward(self, steps=1):
+        return self._replace(start=self.start+steps, length=0)
 
 class StringToTerminalText(TerminalText):
 
