@@ -49,7 +49,8 @@ class Canvas(wx.Panel):
         if self.show_cursor:
             dc.SetPen(wx.Pen((0, 0, 0), 0))
             dc.SetBrush(wx.Brush(self.THEME["colors"]["FOREGROUND"]))
-            dc.DrawRectangle(self.cursor_rect)
+            for cursor_rect in self.cursor_rects:
+                dc.DrawRectangle(cursor_rect)
 
     def on_timer(self, event):
         self.show_cursor = not self.show_cursor
@@ -90,8 +91,14 @@ class Canvas(wx.Panel):
             memdc.SetTextForeground(self.THEME["colors"].get(string.fg, self.THEME["colors"]["FOREGROUND"]))
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
-        x, y = self.document.cursor
-        self.cursor_rect = wx.Rect(x*char_width-1, y*char_height, 3, char_height)
+        self.cursor_rects = []
+        for cursor in self.document.cursors:
+            self.cursor_rects.append(wx.Rect(
+                cursor.x*char_width-1,
+                cursor.y*char_height,
+                3,
+                char_height
+            ))
         self.reset_cursor()
         self.force_repaint_window()
 
@@ -105,8 +112,8 @@ class Canvas(wx.Panel):
 
 class TerminalText:
 
-    def __init__(self, cursor, strings):
-        self.cursor = cursor
+    def __init__(self, cursors, strings):
+        self.cursors = cursors
         self.strings = strings
 
 class Coordinate:
@@ -224,7 +231,7 @@ class StringToTerminalText(TerminalText):
                     x=start+length
                 ),
             ],
-            cursor=TerminalCursor(x=start, y=0)
+            cursors=[TerminalCursor(x=start, y=0)]
         )
 
     def keyboard_event(self, event):
@@ -261,7 +268,7 @@ class Editor(TerminalText):
                     fg="WHITE"
                 )
             ]+[x.move(dy=1) for x in self.terminal_text.strings],
-            cursor=self.terminal_text.cursor.move(dy=1)
+            cursors=[x.move(dy=1) for x in self.terminal_text.cursors]
         )
 
     def keyboard_event(self, event):
