@@ -114,7 +114,8 @@ class TerminalCursor(namedtuple(
     ["x", "y"]
 )):
 
-    pass
+    def move(self, dy):
+        return self._replace(y=self.y+dy)
 
 class TerminalTextFragment(namedtuple(
     "TerminalTextFragment",
@@ -245,7 +246,6 @@ class Editor(TerminalText):
 
     def __init__(self, terminal_text, unicode_character=None):
         self.terminal_text = terminal_text
-        (x, y) = self.terminal_text.cursor
         TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
@@ -256,7 +256,7 @@ class Editor(TerminalText):
                     fg="WHITE"
                 )
             ]+[x.move(dy=1) for x in self.terminal_text.strings],
-            cursor=TerminalCursor(x=x, y=y+1)
+            cursor=self.terminal_text.cursor.move(dy=1)
         )
 
     def keyboard_event(self, event):
