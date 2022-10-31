@@ -130,10 +130,10 @@ class TerminalTextFragment(
 ):
     pass
 
-class KeyboardEvent:
-
-    def __init__(self, unicode_character):
-        self.unicode_character = unicode_character
+class KeyboardEvent(
+    namedtuple("KeyboardEvent", "unicode_character")
+):
+    pass
 
 class String(
     namedtuple("String", "string selections")
