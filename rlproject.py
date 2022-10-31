@@ -81,7 +81,7 @@ class Canvas(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.document.get_strings():
+        for string in self.document.strings:
             if string.bold:
                 memdc.SetFont(font_bold)
             else:
@@ -90,7 +90,7 @@ class Canvas(wx.Panel):
             memdc.SetTextForeground(self.THEME["colors"].get(string.fg, self.THEME["colors"]["FOREGROUND"]))
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
-        x, y = self.document.get_cursor()
+        x, y = self.document.cursor
         self.cursor_rect = wx.Rect(x*char_width-1, y*char_height, 3, char_height)
         self.reset_cursor()
         self.force_repaint_window()
@@ -105,23 +105,16 @@ class Canvas(wx.Panel):
 
 class TerminalText:
 
-    """
-    In the styled text terminal domain
-
-    * a document is a list if styled text at a given (x, y)
-    * a cursor position is a position (x, y)
-    * keyboard events are accepted as input
-    """
-
-    def __init__(self, cursor_position, strings):
-        self.cursor_position = cursor_position
+    def __init__(self, cursor, strings):
+        self.cursor = cursor
         self.strings = strings
 
-    def get_cursor(self):
-        return self.cursor_position
+class TerminalCursor(namedtuple(
+    "TerminalCursor",
+    ["x", "y"]
+)):
 
-    def get_strings(self):
-        return self.strings
+    pass
 
 class TerminalTextFragment(namedtuple(
     "TerminalTextFragment",
@@ -195,7 +188,7 @@ class StringToTerminalText(TerminalText):
     I project keyboard events back to the String.
 
     >>> terminal_text = StringToTerminalText(String("hello", [StringSelection(1, 3)]))
-    >>> print("\\n".join(repr(x) for x in terminal_text.get_strings()))
+    >>> print("\\n".join(repr(x) for x in terminal_text.strings))
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
@@ -225,7 +218,7 @@ class StringToTerminalText(TerminalText):
                     x=start+length
                 ),
             ],
-            cursor_position=(start, 0)
+            cursor=TerminalCursor(x=start, y=0)
         )
 
     def keyboard_event(self, event):
@@ -252,7 +245,7 @@ class Editor(TerminalText):
 
     def __init__(self, terminal_text, unicode_character=None):
         self.terminal_text = terminal_text
-        (x, y) = self.terminal_text.get_cursor()
+        (x, y) = self.terminal_text.cursor
         TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
@@ -263,7 +256,7 @@ class Editor(TerminalText):
                     fg="WHITE"
                 )
             ]+[x.move(dy=1) for x in self.terminal_text.strings],
-            cursor_position=(x, y+1)
+            cursor=TerminalCursor(x=x, y=y+1)
         )
 
     def keyboard_event(self, event):
