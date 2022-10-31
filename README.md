@@ -90,3 +90,7 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
     * Enter filter `test`
         * Show only lines matching filters
     * Cursor and edit operations should only work on filtered lines
+
+* Line number projection
+
+* Word wrap projection
