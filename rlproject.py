@@ -109,32 +109,35 @@ class TerminalText:
         self.cursor = cursor
         self.strings = strings
 
-class TerminalCursor(namedtuple(
-    "TerminalCursor",
-    ["x", "y"]
-)):
+class Coordinate:
 
     def move(self, dy):
         return self._replace(y=self.y+dy)
 
-class TerminalTextFragment(namedtuple(
-    "TerminalTextFragment",
-    ["x", "y", "text", "bold", "bg", "fg"],
-    defaults=[None, None, None]
-)):
+class TerminalCursor(
+    namedtuple("TerminalCursor", "x y"),
+    Coordinate
+):
+    pass
 
-    def move(self, dy=0):
-        return self._replace(y=self.y+dy)
+class TerminalTextFragment(
+    namedtuple(
+        "TerminalTextFragment",
+        "x y text bold bg fg",
+        defaults=[None, None, None]
+    ),
+    Coordinate
+):
+    pass
 
 class KeyboardEvent:
 
     def __init__(self, unicode_character):
         self.unicode_character = unicode_character
 
-class String(namedtuple(
-    "String",
-    ["string", "selections"]
-)):
+class String(
+    namedtuple("String", "string selections")
+):
 
     """
     >>> String("hello", [StringSelection(0, 1)]).replace("1").string
@@ -170,10 +173,9 @@ class String(namedtuple(
         """
         return self._replace(selections=[self.selections[-1]._replace(length=5)])
 
-class StringSelection(namedtuple(
-    "StringSelection",
-    ["start", "length"]
-)):
+class StringSelection(
+    namedtuple("StringSelection", "start length")
+):
 
     def move_back(self):
         return self._replace(start=self.start-1, length=0)
