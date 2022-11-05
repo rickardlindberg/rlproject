@@ -303,25 +303,31 @@ class StringToTerminalText(
         else:
             return self
 
-class Editor(TerminalTextProjection):
+class Editor(
+    namedtuple("Editor", "terminal_text terminal_text_in"),
+    TerminalTextProjection
+):
 
-    def __init__(self, terminal_text, unicode_character=None):
-        self.terminal_text_in = terminal_text
-        self.terminal_text = TerminalText(
-            strings=[
-                TerminalTextFragment(
-                    text=f"STATUS: {repr(unicode_character)}",
-                    x=0,
-                    y=0,
-                    bg="MAGENTA",
-                    fg="WHITE"
-                )
-            ]+[x.move(dy=1) for x in self.terminal_text_in.strings],
-            cursors=[x.move(dy=1) for x in self.terminal_text_in.cursors]
+    @staticmethod
+    def project(terminal_text, unicode_character=None):
+        return Editor(
+            terminal_text_in=terminal_text,
+            terminal_text=TerminalText(
+                strings=[
+                    TerminalTextFragment(
+                        text=f"STATUS: {repr(unicode_character)}",
+                        x=0,
+                        y=0,
+                        bg="MAGENTA",
+                        fg="WHITE"
+                    )
+                ]+[x.move(dy=1) for x in terminal_text.strings],
+                cursors=[x.move(dy=1) for x in terminal_text.cursors]
+            )
         )
 
     def keyboard_event(self, event):
-        return Editor(
+        return Editor.project(
             terminal_text=self.terminal_text_in.keyboard_event(event),
             unicode_character=event.unicode_character
         )
@@ -338,7 +344,7 @@ if __name__ == "__main__":
         main_frame = wx.Frame(None)
         Canvas(
             main_frame,
-            Editor(
+            Editor.project(
                 StringToTerminalText.project(
                     String("hello world, hello world!", [StringSelection(0, 0)])
                 )
