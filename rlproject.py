@@ -304,14 +304,14 @@ class StringToTerminalText(
             return self
 
 class Editor(
-    namedtuple("Editor", "terminal_text terminal_text_in"),
+    namedtuple("Editor", "terminal_text wrapped_terminal_text"),
     TerminalTextProjection
 ):
 
     @staticmethod
     def project(terminal_text, unicode_character=None):
         return Editor(
-            terminal_text_in=terminal_text,
+            wrapped_terminal_text=terminal_text,
             terminal_text=TerminalText(
                 strings=[
                     TerminalTextFragment(
@@ -328,7 +328,7 @@ class Editor(
 
     def keyboard_event(self, event):
         return Editor.project(
-            terminal_text=self.terminal_text_in.keyboard_event(event),
+            terminal_text=self.wrapped_terminal_text.keyboard_event(event),
             unicode_character=event.unicode_character
         )
 
