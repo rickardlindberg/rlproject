@@ -146,12 +146,11 @@ class String(
     namedtuple("String", "string selections")
 ):
 
-    """
-    >>> String("hello", [StringSelection(0, 1)]).replace("1").string
-    '1ello'
-    """
-
     def replace(self, text):
+        """
+        >>> String("hello", [StringSelection(0, 1)]).replace("1").string
+        '1ello'
+        """
         return String(
             string="".join([
                 self.string[:self.selections[-1].start],
