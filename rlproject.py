@@ -150,6 +150,8 @@ class String(
         """
         >>> String("hello", [StringSelection(0, 1)]).replace("1").string
         '1ello'
+
+        TODO: fix me
         """
         return String(
             string="".join([
@@ -210,6 +212,8 @@ class StringToTerminalText(TerminalText):
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
+
+    TODO: fixme
     """
 
     def __init__(self, string):
