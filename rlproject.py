@@ -29,7 +29,7 @@ class WxTerminalTextDriver(wx.Panel):
 
     def __init__(self, parent, document):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.document = document
+        self.terminal_text = document
         self.cursor_blink_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
@@ -44,11 +44,11 @@ class WxTerminalTextDriver(wx.Panel):
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        new_document = self.document.keyboard_event(KeyboardEvent(
+        new_document = self.terminal_text.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
-        if new_document != self.document:
-            self.document = new_document
+        if new_document != self.terminal_text:
+            self.terminal_text = new_document
             self.repaint_bitmap()
 
     def on_paint(self, event):
@@ -90,7 +90,7 @@ class WxTerminalTextDriver(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.document.strings:
+        for string in self.terminal_text.strings:
             if string.bold:
                 memdc.SetFont(font_bold)
             else:
@@ -100,7 +100,7 @@ class WxTerminalTextDriver(wx.Panel):
             memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
         del memdc
         self.cursor_rects = []
-        for cursor in self.document.cursors:
+        for cursor in self.terminal_text.cursors:
             self.cursor_rects.append(wx.Rect(
                 cursor.x*char_width-1,
                 cursor.y*char_height,
