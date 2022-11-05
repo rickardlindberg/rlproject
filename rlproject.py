@@ -157,19 +157,19 @@ class String(
                 text,
                 self.string[self.selections[-1].start+self.selections[-1].length:],
             ]),
-            selections=[self.selections[-1].move_forward()]
+            selections=[self.selections[-1].move_cursor_forward()]
         )
 
     def move_cursor_back(self):
         return String(
             string=self.string,
-            selections=[self.selections[-1].move_back()]
+            selections=[self.selections[-1].move_cursor_back()]
         )
 
     def move_cursor_forward(self):
         return String(
             string=self.string,
-            selections=[self.selections[-1].move_forward()]
+            selections=[self.selections[-1].move_cursor_forward()]
         )
 
     def select_next_word(self):
@@ -186,11 +186,14 @@ class StringSelection(
     namedtuple("StringSelection", "start length")
 ):
 
-    def move_back(self, steps=1):
+    def move_cursor_back(self, steps=1):
         return self._replace(start=self.start-steps, length=0)
 
-    def move_forward(self, steps=1):
+    def move_cursor_forward(self, steps=1):
         return self._replace(start=self.start+steps, length=0)
+
+    def move_forward(self, steps=1):
+        return self._replace(start=self.start+steps)
 
 class StringToTerminalText(TerminalText):
 
