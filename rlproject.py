@@ -1,7 +1,15 @@
 import wx
 from collections import namedtuple
 
-class Canvas(wx.Panel):
+class WxTerminalTextDriver(wx.Panel):
+
+    @staticmethod
+    def run(terminal_text):
+        app = wx.App()
+        main_frame = wx.Frame(None)
+        WxTerminalTextDriver(main_frame, terminal_text)
+        main_frame.Show()
+        app.MainLoop()
 
     THEME = {
         "font_size": 17,
@@ -340,15 +348,10 @@ if __name__ == "__main__":
             sys.exit(1)
         print("ok")
     else:
-        app = wx.App()
-        main_frame = wx.Frame(None)
-        Canvas(
-            main_frame,
+        WxTerminalTextDriver.run(
             Editor.project(
                 StringToTerminalText.project(
                     String("hello world, hello world!", [StringSelection(0, 0)])
                 )
             )
         )
-        main_frame.Show()
-        app.MainLoop()
