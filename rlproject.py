@@ -150,16 +150,19 @@ class String(
         """
         >>> String("hello", [StringSelection(0, 1)]).replace("1").string
         '1ello'
-
-        TODO: fix me
         """
+        parts = []
+        selections = []
+        last_pos = 0
+        for selection in self.selections:
+            parts.append(self.string[last_pos:selection.pos_start])
+            last_pos = selection.pos_end
+            parts.append(text)
+            selections.append(StringSelection(start=len("".join(parts)), length=0))
+        parts.append(self.string[last_pos:])
         return String(
-            string="".join([
-                self.string[:self.selections[-1].start],
-                text,
-                self.string[self.selections[-1].start+self.selections[-1].length:],
-            ]),
-            selections=[self.selections[-1].move_cursor_forward()]
+            string="".join(parts),
+            selections=selections
         )
 
     def move_cursor_back(self):
