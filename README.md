@@ -94,3 +94,5 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
 * Line number projection
 
 * Word wrap projection
+
+* Status line at the bottom
