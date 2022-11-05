@@ -27,9 +27,9 @@ class WxTerminalTextDriver(wx.Panel):
         },
     }
 
-    def __init__(self, parent, document):
+    def __init__(self, parent, terminal_text):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.terminal_text = document
+        self.terminal_text = terminal_text
         self.cursor_blink_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
