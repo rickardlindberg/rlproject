@@ -110,11 +110,21 @@ class Canvas(wx.Panel):
         self.Refresh()
         self.Update()
 
-class TerminalText:
+class TerminalText(
+    namedtuple("TerminalText", "cursors strings"),
+):
 
-    def __init__(self, cursors, strings):
-        self.cursors = cursors
-        self.strings = strings
+    pass
+
+class TerminalTextProjection:
+
+    @property
+    def cursors(self):
+        return self.terminal_text.cursors
+
+    @property
+    def strings(self):
+        return self.terminal_text.strings
 
 class Coordinate:
 
@@ -221,7 +231,7 @@ class StringSelection(
     def move_forward(self, steps=1):
         return self._replace(start=self.start+steps)
 
-class StringToTerminalText(TerminalText):
+class StringToTerminalText(TerminalTextProjection):
 
     """
     I project a String to a TerminalText.
@@ -259,7 +269,7 @@ class StringToTerminalText(TerminalText):
             y=0,
             x=last_pos
         ))
-        TerminalText.__init__(self,
+        self.terminal_text = TerminalText(
             strings=strings,
             cursors=[
                 TerminalCursor(x=selection.start, y=0)
@@ -288,11 +298,11 @@ class StringToTerminalText(TerminalText):
         else:
             return self
 
-class Editor(TerminalText):
+class Editor(TerminalTextProjection):
 
     def __init__(self, terminal_text, unicode_character=None):
-        self.terminal_text = terminal_text
-        TerminalText.__init__(self,
+        self.terminal_text_in = terminal_text
+        self.terminal_text = TerminalText(
             strings=[
                 TerminalTextFragment(
                     text=f"STATUS: {repr(unicode_character)}",
@@ -301,13 +311,13 @@ class Editor(TerminalText):
                     bg="MAGENTA",
                     fg="WHITE"
                 )
-            ]+[x.move(dy=1) for x in self.terminal_text.strings],
-            cursors=[x.move(dy=1) for x in self.terminal_text.cursors]
+            ]+[x.move(dy=1) for x in self.terminal_text_in.strings],
+            cursors=[x.move(dy=1) for x in self.terminal_text_in.cursors]
         )
 
     def keyboard_event(self, event):
         return Editor(
-            terminal_text=self.terminal_text.keyboard_event(event),
+            terminal_text=self.terminal_text_in.keyboard_event(event),
             unicode_character=event.unicode_character
         )
 
