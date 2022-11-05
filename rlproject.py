@@ -191,6 +191,24 @@ class StringSelection(
     namedtuple("StringSelection", "start length")
 ):
 
+    @property
+    def abs_lenght(self):
+        return abs(self.length)
+
+    @property
+    def pos_start(self):
+        if self.length < 0:
+            return self.start + self.length
+        else:
+            return self.start
+
+    @property
+    def pos_end(self):
+        if self.length > 0:
+            return self.start + self.length
+        else:
+            return self.start
+
     def move_cursor_back(self, steps=1):
         return self._replace(start=self.start-steps, length=0)
 
@@ -212,34 +230,34 @@ class StringToTerminalText(TerminalText):
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
-
-    TODO: fixme
     """
 
     def __init__(self, string):
         self.string = string
         string = self.string.string
-        start = self.string.selections[0].start
-        length = self.string.selections[0].length
+        strings = []
+        last_pos = 0
+        for selection in self.string.selections:
+            strings.append(TerminalTextFragment(
+                text=string[last_pos:selection.pos_start],
+                y=0,
+                x=last_pos
+            ))
+            last_pos += len(string[last_pos:selection.pos_start])
+            strings.append(TerminalTextFragment(
+                text=string[selection.pos_start:selection.pos_end],
+                y=0,
+                x=last_pos,
+                bg="YELLOW"
+            ))
+            last_pos += selection.abs_lenght
+        strings.append(TerminalTextFragment(
+            text=string[last_pos:],
+            y=0,
+            x=last_pos
+        ))
         TerminalText.__init__(self,
-            strings=[
-                TerminalTextFragment(
-                    text=string[:start],
-                    y=0,
-                    x=0
-                ),
-                TerminalTextFragment(
-                    text=string[start:start+length],
-                    y=0,
-                    x=start,
-                    bg="YELLOW"
-                ),
-                TerminalTextFragment(
-                    text=string[start+length:],
-                    y=0,
-                    x=start+length
-                ),
-            ],
+            strings=strings,
             cursors=[
                 TerminalCursor(x=selection.start, y=0)
                 for selection
