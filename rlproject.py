@@ -175,12 +175,15 @@ class String(
     def select_next_word(self):
         """
         >>> String("hello there", [StringSelection(0, 0)]).select_next_word()
-        String(string='hello there', selections=[StringSelection(start=0, length=5)])
+        String(string='hello there', selections=[StringSelection(start=5, length=-5)])
         """
-        if self.selections[-1].length > 0:
-            return self._replace(selections=self.selections+[self.selections[-1].move_forward(self.selections[-1].length)])
+        if abs(self.selections[-1].length) > 0:
+            return self._replace(selections=self.selections+[self.selections[-1].move_forward(abs(self.selections[-1].length))])
         else:
-            return self._replace(selections=[self.selections[-1]._replace(length=5)])
+            return self._replace(selections=[StringSelection(
+                start=self.selections[-1].start+5,
+                length=-5
+            )])
 
 class StringSelection(
     namedtuple("StringSelection", "start length")
