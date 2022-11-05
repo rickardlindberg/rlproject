@@ -22,7 +22,7 @@ class Canvas(wx.Panel):
     def __init__(self, parent, document):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
         self.document = document
-        self.cursor_timer = wx.Timer(self)
+        self.cursor_blink_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
         self.Bind(wx.EVT_CHAR, self.on_char)
@@ -46,23 +46,23 @@ class Canvas(wx.Panel):
     def on_paint(self, event):
         dc = wx.AutoBufferedPaintDC(self)
         dc.DrawBitmap(self.bitmap, 0, 0, True)
-        if self.show_cursor:
+        if self.show_cursors:
             dc.SetPen(wx.Pen((0, 0, 0), 0))
             dc.SetBrush(wx.Brush(self.THEME["colors"]["FOREGROUND"]))
             for cursor_rect in self.cursor_rects:
                 dc.DrawRectangle(cursor_rect)
 
     def on_timer(self, event):
-        self.show_cursor = not self.show_cursor
+        self.show_cursors = not self.show_cursors
         self.force_repaint_window()
 
     def on_set_focus(self, event):
-        self.reset_cursor()
+        self.reset_cursor_blink()
         self.force_repaint_window()
 
     def on_kill_focus(self, event):
-        self.cursor_timer.Stop()
-        self.show_cursor = True
+        self.cursor_blink_timer.Stop()
+        self.show_cursors = True
         self.force_repaint_window()
 
     def repaint_bitmap(self):
@@ -99,12 +99,12 @@ class Canvas(wx.Panel):
                 3,
                 char_height
             ))
-        self.reset_cursor()
+        self.reset_cursor_blink()
         self.force_repaint_window()
 
-    def reset_cursor(self):
-        self.show_cursor = True
-        self.cursor_timer.Start(500)
+    def reset_cursor_blink(self):
+        self.show_cursors = True
+        self.cursor_blink_timer.Start(500)
 
     def force_repaint_window(self):
         self.Refresh()
@@ -210,8 +210,8 @@ class StringToTerminalText(TerminalText):
     def __init__(self, string):
         self.string = string
         string = self.string.string
-        start = self.string.selections[-1].start
-        length = self.string.selections[-1].length
+        start = self.string.selections[0].start
+        length = self.string.selections[0].length
         TerminalText.__init__(self,
             strings=[
                 TerminalTextFragment(
@@ -231,7 +231,11 @@ class StringToTerminalText(TerminalText):
                     x=start+length
                 ),
             ],
-            cursors=[TerminalCursor(x=start, y=0)]
+            cursors=[
+                TerminalCursor(x=selection.start, y=0)
+                for selection
+                in self.string.selections
+            ]
         )
 
     def keyboard_event(self, event):
