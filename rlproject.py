@@ -153,7 +153,28 @@ class TerminalTextFragment(
     ),
     Coordinate
 ):
-    pass
+
+    def split(self, text, replacement, **kwargs):
+        """
+        >>> print("\\n".join(repr(x) for x in TerminalTextFragment(0, 0, "hello").split("ll", "||", fg="YELLOW")))
+        TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
+        TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
+
+        >>> print("\\n".join(repr(x) for x in TerminalTextFragment(0, 0, "n2").split("n", "N")))
+        TerminalTextFragment(x=0, y=0, text='', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
+        """
+        parts = []
+        x = self.x
+        for fragment in self.text.split(text):
+            if len(parts) > 0:
+                parts.append(self._replace(text=replacement, x=x, **kwargs))
+                x += len(replacement)
+            parts.append(self._replace(text=fragment, x=x))
+            x += len(fragment)
+        return parts
 
 class KeyboardEvent(
     namedtuple("KeyboardEvent", "unicode_character")
@@ -163,6 +184,11 @@ class KeyboardEvent(
 class String(
     namedtuple("String", "string selections")
 ):
+
+    @staticmethod
+    def from_file(path):
+        with open(path) as f:
+            return String(string=f.read(), selections=[StringSelection(0, 0)])
 
     def replace(self, text):
         """
@@ -254,40 +280,51 @@ class StringToTerminalText(
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
+
+    >>> terminal_text = StringToTerminalText.project(String("1\\n2", [StringSelection(1, 0)]))
+    >>> print("\\n".join(repr(x) for x in terminal_text.strings))
+    TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
+    TerminalTextFragment(x=1, y=0, text='', bold=None, bg='YELLOW', fg=None)
+    TerminalTextFragment(x=1, y=0, text='', bold=None, bg=None, fg=None)
+    TerminalTextFragment(x=1, y=0, text='\\\\n', bold=None, bg=None, fg='MAGENTA')
+    TerminalTextFragment(x=3, y=0, text='2', bold=None, bg=None, fg=None)
     """
 
     @staticmethod
     def project(string):
+        def replace_newlines(text_fragment, **kwargs):
+            text_fragments = text_fragment.split("\n", "\\n", **kwargs)
+            return (text_fragments, sum(len(x.text) for x in text_fragments))
         strings = []
+        cursors = []
         last_pos = 0
+        last_index = 0
         for selection in string.selections:
-            strings.append(TerminalTextFragment(
-                text=string.string[last_pos:selection.pos_start],
+            foo, size = replace_newlines(TerminalTextFragment(
+                text=string.string[last_index:selection.pos_start],
                 y=0,
                 x=last_pos
-            ))
-            last_pos += len(string.string[last_pos:selection.pos_start])
-            strings.append(TerminalTextFragment(
+            ), fg="MAGENTA")
+            strings.extend(foo)
+            last_pos += size
+            foo, size = replace_newlines(TerminalTextFragment(
                 text=string.string[selection.pos_start:selection.pos_end],
                 y=0,
                 x=last_pos,
                 bg="YELLOW"
             ))
-            last_pos += selection.abs_lenght
-        strings.append(TerminalTextFragment(
-            text=string.string[last_pos:],
+            strings.extend(foo)
+            last_pos += size
+            cursors.append(TerminalCursor(x=last_pos, y=0))
+            last_index = selection.pos_end
+        foo, size = replace_newlines(TerminalTextFragment(
+            text=string.string[last_index:],
             y=0,
             x=last_pos
-        ))
+        ), fg="MAGENTA")
+        strings.extend(foo)
         return StringToTerminalText(
-            terminal_text=TerminalText(
-                strings=strings,
-                cursors=[
-                    TerminalCursor(x=selection.start, y=0)
-                    for selection
-                    in string.selections
-                ]
-            ),
+            terminal_text=TerminalText(strings=strings, cursors=cursors),
             string=string
         )
 
@@ -351,7 +388,7 @@ if __name__ == "__main__":
         WxTerminalTextDriver.run(
             Editor.project(
                 StringToTerminalText.project(
-                    String("hello world, hello world!", [StringSelection(0, 0)])
+                    String.from_file("rlproject.py")
                 )
             )
         )
