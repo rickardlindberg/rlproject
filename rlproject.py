@@ -231,68 +231,73 @@ class StringSelection(
     def move_forward(self, steps=1):
         return self._replace(start=self.start+steps)
 
-class StringToTerminalText(TerminalTextProjection):
+class StringToTerminalText(
+    namedtuple("StringToTerminalText", "terminal_text string"),
+    TerminalTextProjection
+):
 
     """
     I project a String to a TerminalText.
 
     I project keyboard events back to the String.
 
-    >>> terminal_text = StringToTerminalText(String("hello", [StringSelection(1, 3)]))
+    >>> terminal_text = StringToTerminalText.project(String("hello", [StringSelection(1, 3)]))
     >>> print("\\n".join(repr(x) for x in terminal_text.strings))
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
     """
 
-    def __init__(self, string):
-        self.string = string
-        string = self.string.string
+    @staticmethod
+    def project(string):
         strings = []
         last_pos = 0
-        for selection in self.string.selections:
+        for selection in string.selections:
             strings.append(TerminalTextFragment(
-                text=string[last_pos:selection.pos_start],
+                text=string.string[last_pos:selection.pos_start],
                 y=0,
                 x=last_pos
             ))
-            last_pos += len(string[last_pos:selection.pos_start])
+            last_pos += len(string.string[last_pos:selection.pos_start])
             strings.append(TerminalTextFragment(
-                text=string[selection.pos_start:selection.pos_end],
+                text=string.string[selection.pos_start:selection.pos_end],
                 y=0,
                 x=last_pos,
                 bg="YELLOW"
             ))
             last_pos += selection.abs_lenght
         strings.append(TerminalTextFragment(
-            text=string[last_pos:],
+            text=string.string[last_pos:],
             y=0,
             x=last_pos
         ))
-        self.terminal_text = TerminalText(
-            strings=strings,
-            cursors=[
-                TerminalCursor(x=selection.start, y=0)
-                for selection
-                in self.string.selections
-            ]
+        return StringToTerminalText(
+            terminal_text=TerminalText(
+                strings=strings,
+                cursors=[
+                    TerminalCursor(x=selection.start, y=0)
+                    for selection
+                    in string.selections
+                ]
+            ),
+            string=string
         )
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
-            return StringToTerminalText(
+            return StringToTerminalText.project(
                 self.string.move_cursor_forward()
             )
         elif event.unicode_character == "\x02": # Ctrl-B
-            return StringToTerminalText(
+            return StringToTerminalText.project(
                 self.string.move_cursor_back()
             )
         elif event.unicode_character == "\x0e": # Ctrl-N
-            return StringToTerminalText(
+            return StringToTerminalText.project(
                 self.string.select_next_word()
             )
         elif event.unicode_character and ord(event.unicode_character) >= 32:
-            return StringToTerminalText(
+            return StringToTerminalText.project(
                 self.string.replace(event.unicode_character)
             )
         else:
@@ -334,7 +339,7 @@ if __name__ == "__main__":
         Canvas(
             main_frame,
             Editor(
-                StringToTerminalText(
+                StringToTerminalText.project(
                     String("hello world, hello world!", [StringSelection(0, 0)])
                 )
             )
