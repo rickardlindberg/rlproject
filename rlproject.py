@@ -121,7 +121,6 @@ class WxTerminalTextDriver(wx.Panel):
 class TerminalText(
     namedtuple("TerminalText", "fragments cursors"),
 ):
-
     pass
 
 class TerminalTextProjection:
