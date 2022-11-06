@@ -196,6 +196,22 @@ class KeyboardEvent(
 ):
     pass
 
+class Lines(
+    namedtuple("Lines", "lines")
+):
+    pass
+
+class StringToLines(
+    namedtuple("StringToLines", "string lines")
+):
+
+    @staticmethod
+    def project(string):
+        return StringToLines(string=string, lines=[string])
+
+    def keyboard_event(self, event):
+        return StringToLines.project(self.string.keyboard_event(event))
+
 class String(
     namedtuple("String", "string selections")
 ):
@@ -204,6 +220,18 @@ class String(
     def from_file(path):
         with open(path) as f:
             return String(string=f.read(), selections=[StringSelection(0, 0)])
+
+    def keyboard_event(self, event):
+        if event.unicode_character == "\x06": # Ctrl-F
+            return self.move_cursor_forward()
+        elif event.unicode_character == "\x02": # Ctrl-B
+            return self.move_cursor_back()
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            return self.select_next_word()
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
+            return self.replace(event.unicode_character)
+        else:
+            return self
 
     def replace(self, text):
         """
@@ -280,6 +308,25 @@ class StringSelection(
     def move_forward(self, steps=1):
         return self._replace(start=self.start+steps)
 
+class LinesToTerminalText(
+    namedtuple("LinesToTerminalText", "terminal_text lines"),
+    TerminalTextProjection
+):
+
+    @staticmethod
+    def project(lines):
+        texts = [
+            StringToTerminalText.project(string, y=index)
+            for index, string in enumerate(lines.lines)
+        ]
+        return LinesToTerminalText(
+            terminal_text=texts[0],
+            lines=lines
+        )
+
+    def keyboard_event(self, event):
+        return LinesToTerminalText.project(self.lines.keyboard_event(event))
+
 class StringToTerminalText(
     namedtuple("StringToTerminalText", "terminal_text string"),
     TerminalTextProjection
@@ -333,24 +380,9 @@ class StringToTerminalText(
         )
 
     def keyboard_event(self, event):
-        if event.unicode_character == "\x06": # Ctrl-F
-            return StringToTerminalText.project(
-                self.string.move_cursor_forward()
-            )
-        elif event.unicode_character == "\x02": # Ctrl-B
-            return StringToTerminalText.project(
-                self.string.move_cursor_back()
-            )
-        elif event.unicode_character == "\x0e": # Ctrl-N
-            return StringToTerminalText.project(
-                self.string.select_next_word()
-            )
-        elif event.unicode_character and ord(event.unicode_character) >= 32:
-            return StringToTerminalText.project(
-                self.string.replace(event.unicode_character)
-            )
-        else:
-            return self
+        return StringToTerminalText.project(
+            self.string.move_cursor_forward()
+        )
 
 class Editor(
     namedtuple("Editor", "terminal_text wrapped_terminal_text"),
@@ -394,8 +426,10 @@ if __name__ == "__main__":
     else:
         WxTerminalTextDriver.run(
             Editor.project(
-                StringToTerminalText.project(
-                    String.from_file("rlproject.py")
+                LinesToTerminalText.project(
+                    StringToLines.project(
+                        String.from_file("rlproject.py")
+                    )
                 )
             )
         )
