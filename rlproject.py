@@ -119,7 +119,7 @@ class WxTerminalTextDriver(wx.Panel):
         self.Update()
 
 class TerminalText(
-    namedtuple("TerminalText", "cursors fragments"),
+    namedtuple("TerminalText", "fragments cursors"),
 ):
 
     pass
@@ -127,12 +127,12 @@ class TerminalText(
 class TerminalTextProjection:
 
     @property
-    def cursors(self):
-        return self.terminal_text.cursors
-
-    @property
     def fragments(self):
         return self.terminal_text.fragments
+
+    @property
+    def cursors(self):
+        return self.terminal_text.cursors
 
 class Coordinate:
 
