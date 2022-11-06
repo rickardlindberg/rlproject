@@ -155,12 +155,12 @@ class TerminalTextFragment(
 
     def split(self, text, replacement, **kwargs):
         """
-        >>> print("\\n".join(repr(x) for x in TerminalTextFragment(0, 0, "hello").split("ll", "||", fg="YELLOW")))
+        >>> print_namedtuples(TerminalTextFragment(0, 0, "hello").split("ll", "||", fg="YELLOW"))
         TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
-        >>> print("\\n".join(repr(x) for x in TerminalTextFragment(0, 0, "n2").split("n", "N")))
+        >>> print_namedtuples(TerminalTextFragment(0, 0, "n2").split("n", "N"))
         TerminalTextFragment(x=0, y=0, text='', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
@@ -275,13 +275,13 @@ class StringToTerminalText(
     I project keyboard events back to the String.
 
     >>> terminal_text = StringToTerminalText.project(String("hello", [StringSelection(1, 3)]))
-    >>> print("\\n".join(repr(x) for x in terminal_text.fragments))
+    >>> print_namedtuples(terminal_text.fragments)
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
     >>> terminal_text = StringToTerminalText.project(String("1\\n2", [StringSelection(1, 0)]))
-    >>> print("\\n".join(repr(x) for x in terminal_text.fragments))
+    >>> print_namedtuples(terminal_text.fragments)
     TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=1, y=0, text='', bold=None, bg=None, fg=None)
@@ -375,6 +375,9 @@ class Editor(
             terminal_text=self.wrapped_terminal_text.keyboard_event(event),
             unicode_character=event.unicode_character
         )
+
+def print_namedtuples(namedtuples):
+    print("\n".join(repr(x) for x in namedtuples))
 
 if __name__ == "__main__":
     import sys
