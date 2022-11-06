@@ -207,7 +207,19 @@ class StringToLines(
 
     @staticmethod
     def project(string):
-        return StringToLines(string=string, lines=[string])
+        """
+        >>> string = String(string="one\\ntwo", selections=[StringSelection(0, 0)])
+        >>> print_namedtuples(StringToLines.project(string).lines)
+        String(string='one', selections=[StringSelection(start=0, length=0)])
+        String(string='two', selections=[])
+        """
+        return StringToLines(
+            string=string,
+            lines=tuple(
+                String(x, string.selections)
+                for x in string.string.splitlines()
+            )
+        )
 
     def keyboard_event(self, event):
         return StringToLines.project(self.string.keyboard_event(event))
@@ -315,12 +327,14 @@ class LinesToTerminalText(
 
     @staticmethod
     def project(lines):
-        texts = [
-            StringToTerminalText.project(string, y=index)
-            for index, string in enumerate(lines.lines)
-        ]
+        fragments = []
+        cursors = []
+        for index, string in enumerate(lines.lines):
+            x = StringToTerminalText.project(string, y=index)
+            fragments.extend(x.fragments)
+            cursors.extend(x.cursors)
         return LinesToTerminalText(
-            terminal_text=texts[0],
+            terminal_text=TerminalText(fragments=fragments, cursors=cursors),
             lines=lines
         )
 
