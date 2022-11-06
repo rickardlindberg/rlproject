@@ -304,29 +304,28 @@ class StringToTerminalText(
     """
 
     @staticmethod
-    def project(string):
+    def project(string, x=0, y=0):
         fragments = TerminalTextFragmentsBuilder()
         cursors = []
-        next_x = 0
         last_pos = 0
         for selection in string.selections:
-            next_x += fragments.extend(TerminalTextFragment(
+            x += fragments.extend(TerminalTextFragment(
                 text=string.string[last_pos:selection.pos_start],
-                y=0,
-                x=next_x
+                y=y,
+                x=x
             ).replace_newlines(fg="MAGENTA"))
-            next_x += fragments.extend(TerminalTextFragment(
+            x += fragments.extend(TerminalTextFragment(
                 text=string.string[selection.pos_start:selection.pos_end],
-                y=0,
-                x=next_x,
+                y=y,
+                x=x,
                 bg="YELLOW"
             ).replace_newlines())
-            cursors.append(TerminalCursor(x=next_x, y=0))
+            cursors.append(TerminalCursor(x=x, y=y))
             last_pos = selection.pos_end
         fragments.extend(TerminalTextFragment(
             text=string.string[last_pos:],
-            y=0,
-            x=next_x
+            y=y,
+            x=x
         ).replace_newlines(fg="MAGENTA"))
         return StringToTerminalText(
             terminal_text=TerminalText(fragments=fragments.to_tuple(), cursors=cursors),
