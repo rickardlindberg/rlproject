@@ -211,7 +211,7 @@ class StringToLines(
         >>> string = String(string="one\\ntwo", selections=[StringSelection(0, 0)])
         >>> print_namedtuples(StringToLines.project(string).lines)
         String(string='one', selections=[StringSelection(start=0, length=0)])
-        String(string='two', selections=[])
+        String(string='two', selections=[StringSelection(start=0, length=0)])
         """
         return StringToLines(
             string=string,
