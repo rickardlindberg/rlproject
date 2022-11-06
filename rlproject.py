@@ -153,27 +153,43 @@ class TerminalTextFragment(
     Coordinate
 ):
 
-    def split(self, text, replacement, **kwargs):
+    def replace_newlines(self, **styling_kwargs):
+        return self.split("\n", text="\\n", **styling_kwargs)
+
+    def split(self, separator, **styling_kwargs):
         """
-        >>> print_namedtuples(TerminalTextFragment(0, 0, "hello").split("ll", "||", fg="YELLOW"))
+        >>> print_namedtuples(TerminalTextFragment(0, 0, "hello").split("ll", text="||", fg="YELLOW"))
         TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
-        >>> print_namedtuples(TerminalTextFragment(0, 0, "n2").split("n", "N"))
-        TerminalTextFragment(x=0, y=0, text='', bold=None, bg=None, fg=None)
+        >>> print_namedtuples(TerminalTextFragment(0, 0, "n2").split("n", text="N"))
         TerminalTextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
         """
-        parts = []
-        x = self.x
-        for fragment in self.text.split(text):
-            if len(parts) > 0:
-                parts.append(self._replace(text=replacement, x=x, **kwargs))
-                x += len(replacement)
-            parts.append(self._replace(text=fragment, x=x))
-            x += len(fragment)
-        return parts
+        fragments = TerminalTextFragmentsBuilder()
+        next_x = self.x
+        for index, subtext in enumerate(self.text.split(separator)):
+            if index > 0:
+                next_x += fragments.add(self._replace(x=next_x, **styling_kwargs))
+            next_x += fragments.add(self._replace(x=next_x, text=subtext))
+        return fragments.to_tuple()
+
+class TerminalTextFragmentsBuilder:
+
+    def __init__(self):
+        self.fragments = []
+
+    def add(self, fragment):
+        if fragment.text:
+            self.fragments.append(fragment)
+        return len(fragment.text)
+
+    def extend(self, fragments):
+        return sum(self.add(x) for x in fragments)
+
+    def to_tuple(self):
+        return tuple(self.fragments)
 
 class KeyboardEvent(
     namedtuple("KeyboardEvent", "unicode_character")
@@ -283,47 +299,37 @@ class StringToTerminalText(
     >>> terminal_text = StringToTerminalText.project(String("1\\n2", [StringSelection(1, 0)]))
     >>> print_namedtuples(terminal_text.fragments)
     TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
-    TerminalTextFragment(x=1, y=0, text='', bold=None, bg='YELLOW', fg=None)
-    TerminalTextFragment(x=1, y=0, text='', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='\\\\n', bold=None, bg=None, fg='MAGENTA')
     TerminalTextFragment(x=3, y=0, text='2', bold=None, bg=None, fg=None)
     """
 
     @staticmethod
     def project(string):
-        def replace_newlines(text_fragment, **kwargs):
-            text_fragments = text_fragment.split("\n", "\\n", **kwargs)
-            return (text_fragments, sum(len(x.text) for x in text_fragments))
-        fragments = []
+        fragments = TerminalTextFragmentsBuilder()
         cursors = []
+        next_x = 0
         last_pos = 0
-        last_index = 0
         for selection in string.selections:
-            foo, size = replace_newlines(TerminalTextFragment(
-                text=string.string[last_index:selection.pos_start],
+            next_x += fragments.extend(TerminalTextFragment(
+                text=string.string[last_pos:selection.pos_start],
                 y=0,
-                x=last_pos
-            ), fg="MAGENTA")
-            fragments.extend(foo)
-            last_pos += size
-            foo, size = replace_newlines(TerminalTextFragment(
+                x=next_x
+            ).replace_newlines(fg="MAGENTA"))
+            next_x += fragments.extend(TerminalTextFragment(
                 text=string.string[selection.pos_start:selection.pos_end],
                 y=0,
-                x=last_pos,
+                x=next_x,
                 bg="YELLOW"
-            ))
-            fragments.extend(foo)
-            last_pos += size
-            cursors.append(TerminalCursor(x=last_pos, y=0))
-            last_index = selection.pos_end
-        foo, size = replace_newlines(TerminalTextFragment(
-            text=string.string[last_index:],
+            ).replace_newlines())
+            cursors.append(TerminalCursor(x=next_x, y=0))
+            last_pos = selection.pos_end
+        fragments.extend(TerminalTextFragment(
+            text=string.string[last_pos:],
             y=0,
-            x=last_pos
-        ), fg="MAGENTA")
-        fragments.extend(foo)
+            x=next_x
+        ).replace_newlines(fg="MAGENTA"))
         return StringToTerminalText(
-            terminal_text=TerminalText(fragments=fragments, cursors=cursors),
+            terminal_text=TerminalText(fragments=fragments.to_tuple(), cursors=cursors),
             string=string
         )
 
