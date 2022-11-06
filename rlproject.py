@@ -90,7 +90,7 @@ class WxTerminalTextDriver(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.terminal_text.strings:
+        for string in self.terminal_text.fragments:
             if string.bold:
                 memdc.SetFont(font_bold)
             else:
@@ -119,7 +119,7 @@ class WxTerminalTextDriver(wx.Panel):
         self.Update()
 
 class TerminalText(
-    namedtuple("TerminalText", "cursors strings"),
+    namedtuple("TerminalText", "cursors fragments"),
 ):
 
     pass
@@ -131,8 +131,8 @@ class TerminalTextProjection:
         return self.terminal_text.cursors
 
     @property
-    def strings(self):
-        return self.terminal_text.strings
+    def fragments(self):
+        return self.terminal_text.fragments
 
 class Coordinate:
 
@@ -276,13 +276,13 @@ class StringToTerminalText(
     I project keyboard events back to the String.
 
     >>> terminal_text = StringToTerminalText.project(String("hello", [StringSelection(1, 3)]))
-    >>> print("\\n".join(repr(x) for x in terminal_text.strings))
+    >>> print("\\n".join(repr(x) for x in terminal_text.fragments))
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
     >>> terminal_text = StringToTerminalText.project(String("1\\n2", [StringSelection(1, 0)]))
-    >>> print("\\n".join(repr(x) for x in terminal_text.strings))
+    >>> print("\\n".join(repr(x) for x in terminal_text.fragments))
     TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=1, y=0, text='', bold=None, bg=None, fg=None)
@@ -295,7 +295,7 @@ class StringToTerminalText(
         def replace_newlines(text_fragment, **kwargs):
             text_fragments = text_fragment.split("\n", "\\n", **kwargs)
             return (text_fragments, sum(len(x.text) for x in text_fragments))
-        strings = []
+        fragments = []
         cursors = []
         last_pos = 0
         last_index = 0
@@ -305,7 +305,7 @@ class StringToTerminalText(
                 y=0,
                 x=last_pos
             ), fg="MAGENTA")
-            strings.extend(foo)
+            fragments.extend(foo)
             last_pos += size
             foo, size = replace_newlines(TerminalTextFragment(
                 text=string.string[selection.pos_start:selection.pos_end],
@@ -313,7 +313,7 @@ class StringToTerminalText(
                 x=last_pos,
                 bg="YELLOW"
             ))
-            strings.extend(foo)
+            fragments.extend(foo)
             last_pos += size
             cursors.append(TerminalCursor(x=last_pos, y=0))
             last_index = selection.pos_end
@@ -322,9 +322,9 @@ class StringToTerminalText(
             y=0,
             x=last_pos
         ), fg="MAGENTA")
-        strings.extend(foo)
+        fragments.extend(foo)
         return StringToTerminalText(
-            terminal_text=TerminalText(strings=strings, cursors=cursors),
+            terminal_text=TerminalText(fragments=fragments, cursors=cursors),
             string=string
         )
 
@@ -358,7 +358,7 @@ class Editor(
         return Editor(
             wrapped_terminal_text=terminal_text,
             terminal_text=TerminalText(
-                strings=[
+                fragments=[
                     TerminalTextFragment(
                         text=f"STATUS: {repr(unicode_character)}",
                         x=0,
@@ -366,7 +366,7 @@ class Editor(
                         bg="MAGENTA",
                         fg="WHITE"
                     )
-                ]+[x.move(dy=1) for x in terminal_text.strings],
+                ]+[x.move(dy=1) for x in terminal_text.fragments],
                 cursors=[x.move(dy=1) for x in terminal_text.cursors]
             )
         )
