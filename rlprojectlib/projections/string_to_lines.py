@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.string import String, Selections, Selection
+from rlprojectlib.domains.string import String
 
 class StringToLines(
     namedtuple("StringToLines", "string lines")
