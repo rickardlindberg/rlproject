@@ -1,0 +1,29 @@
+from collections import namedtuple
+
+from rlprojectlib.domains.string import String, StringSelection
+
+class StringToLines(
+    namedtuple("StringToLines", "string lines")
+):
+
+    @staticmethod
+    def project(string):
+        """
+        >>> string = String(string="one\\ntwo", selections=[StringSelection(0, 0)])
+        >>> print_namedtuples(StringToLines.project(string).lines)
+        String(string='one', selections=[StringSelection(start=0, length=0)])
+        String(string='two', selections=[StringSelection(start=0, length=0)])
+        """
+        return StringToLines(
+            string=string,
+            lines=tuple(
+                String(x, string.selections)
+                for x in string.string.splitlines()
+            )
+        )
+
+    def keyboard_event(self, event):
+        return StringToLines.project(self.string.keyboard_event(event))
+
+def print_namedtuples(namedtuples):
+    print("\n".join(repr(x) for x in namedtuples))
