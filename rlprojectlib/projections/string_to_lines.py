@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.string import String, StringSelection
+from rlprojectlib.domains.string import String, Selection
 
 class StringToLines(
     namedtuple("StringToLines", "string lines")
@@ -9,10 +9,10 @@ class StringToLines(
     @staticmethod
     def project(string):
         """
-        >>> string = String(string="one\\ntwo", selections=[StringSelection(0, 0)])
+        >>> string = String(string="one\\ntwo", selections=[Selection(0, 0)])
         >>> print_namedtuples(StringToLines.project(string).lines)
-        String(string='one', selections=[StringSelection(start=0, length=0)])
-        String(string='two', selections=[StringSelection(start=0, length=0)])
+        String(string='one', selections=[Selection(start=0, length=0)])
+        String(string='two', selections=[Selection(start=0, length=0)])
         """
         return StringToLines(
             string=string,

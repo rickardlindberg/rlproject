@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.string import String, StringSelection
+from rlprojectlib.domains.string import String, Selection
 from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, TerminalTextFragmentsBuilder, TerminalCursor
 
 class StringToTerminalText(
@@ -13,13 +13,13 @@ class StringToTerminalText(
 
     I project keyboard events back to the String.
 
-    >>> terminal_text = StringToTerminalText.project(String("hello", [StringSelection(1, 3)]))
+    >>> terminal_text = StringToTerminalText.project(String("hello", [Selection(1, 3)]))
     >>> print_namedtuples(terminal_text.fragments)
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
-    >>> terminal_text = StringToTerminalText.project(String("1\\n2", [StringSelection(1, 0)]))
+    >>> terminal_text = StringToTerminalText.project(String("1\\n2", [Selection(1, 0)]))
     >>> print_namedtuples(terminal_text.fragments)
     TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='\\\\n', bold=None, bg=None, fg='MAGENTA')

@@ -7,7 +7,7 @@ class String(
     @staticmethod
     def from_file(path):
         with open(path) as f:
-            return String(string=f.read(), selections=[StringSelection(0, 0)])
+            return String(string=f.read(), selections=[Selection(0, 0)])
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
@@ -23,7 +23,7 @@ class String(
 
     def replace(self, text):
         """
-        >>> String("hello", [StringSelection(0, 1)]).replace("1").string
+        >>> String("hello", [Selection(0, 1)]).replace("1").string
         '1ello'
         """
         parts = []
@@ -33,7 +33,7 @@ class String(
             parts.append(self.string[last_pos:selection.pos_start])
             last_pos = selection.pos_end
             parts.append(text)
-            selections.append(StringSelection(start=len("".join(parts)), length=0))
+            selections.append(Selection(start=len("".join(parts)), length=0))
         parts.append(self.string[last_pos:])
         return String(
             string="".join(parts),
@@ -54,19 +54,19 @@ class String(
 
     def select_next_word(self):
         """
-        >>> String("hello there", [StringSelection(0, 0)]).select_next_word()
-        String(string='hello there', selections=[StringSelection(start=5, length=-5)])
+        >>> String("hello there", [Selection(0, 0)]).select_next_word()
+        String(string='hello there', selections=[Selection(start=5, length=-5)])
         """
         if abs(self.selections[-1].length) > 0:
             return self._replace(selections=self.selections+[self.selections[-1].move_forward(abs(self.selections[-1].length))])
         else:
-            return self._replace(selections=[StringSelection(
+            return self._replace(selections=[Selection(
                 start=self.selections[-1].start+5,
                 length=-5
             )])
 
-class StringSelection(
-    namedtuple("StringSelection", "start length")
+class Selection(
+    namedtuple("Selection", "start length")
 ):
 
     @property
