@@ -9,7 +9,7 @@ class StringToLines(
     @staticmethod
     def project(string):
         """
-        >>> string = String(string="one\\ntwo", selections=Selections([Selection(0, 0)]))
+        >>> string = String.from_string(string="one\\ntwo")
         >>> print_namedtuples(StringToLines.project(string).lines)
         String(string='one', selections=Selections(Selection(start=0, length=0)))
         String(string='two', selections=Selections(Selection(start=0, length=0)))

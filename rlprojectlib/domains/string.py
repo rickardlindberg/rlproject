@@ -7,7 +7,14 @@ class String(
     @staticmethod
     def from_file(path):
         with open(path) as f:
-            return String(string=f.read(), selections=Selections([Selection(0, 0)]))
+            return String.from_string(f.read())
+
+    @staticmethod
+    def from_string(string, selection_start=0, selection_length=0):
+        return String(
+            string=string,
+            selections=Selections([Selection(selection_start, selection_length)])
+        )
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
@@ -23,7 +30,7 @@ class String(
 
     def replace(self, text):
         """
-        >>> String("hello", [Selection(0, 1)]).replace("1").string
+        >>> String.from_string("hello", selection_length=1).replace("1").string
         '1ello'
         """
         parts = []
@@ -54,7 +61,7 @@ class String(
 
     def select_next_word(self):
         """
-        >>> String("hello there", [Selection(0, 0)]).select_next_word()
+        >>> String.from_string("hello there").select_next_word()
         String(string='hello there', selections=Selections(Selection(start=5, length=-5)))
         """
         if abs(self.selections[-1].length) > 0:
