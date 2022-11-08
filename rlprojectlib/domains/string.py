@@ -7,7 +7,7 @@ class String(
     @staticmethod
     def from_file(path):
         with open(path) as f:
-            return String(string=f.read(), selections=[Selection(0, 0)])
+            return String(string=f.read(), selections=Selections([Selection(0, 0)]))
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
@@ -37,33 +37,40 @@ class String(
         parts.append(self.string[last_pos:])
         return String(
             string="".join(parts),
-            selections=selections
+            selections=Selections(selections)
         )
 
     def move_cursor_back(self):
         return String(
             string=self.string,
-            selections=[self.selections[-1].move_cursor_back()]
+            selections=Selections([self.selections[-1].move_cursor_back()])
         )
 
     def move_cursor_forward(self):
         return String(
             string=self.string,
-            selections=[self.selections[-1].move_cursor_forward()]
+            selections=Selections([self.selections[-1].move_cursor_forward()])
         )
 
     def select_next_word(self):
         """
         >>> String("hello there", [Selection(0, 0)]).select_next_word()
-        String(string='hello there', selections=[Selection(start=5, length=-5)])
+        String(string='hello there', selections=Selections(Selection(start=5, length=-5)))
         """
         if abs(self.selections[-1].length) > 0:
-            return self._replace(selections=self.selections+[self.selections[-1].move_forward(abs(self.selections[-1].length))])
+            return self._replace(selections=Selections(
+                list(self.selections)+[self.selections[-1].move_forward(abs(self.selections[-1].length))]
+            ))
         else:
-            return self._replace(selections=[Selection(
+            return self._replace(selections=Selections([Selection(
                 start=self.selections[-1].start+5,
                 length=-5
-            )])
+            )]))
+
+class Selections(tuple):
+
+    def __repr__(self):
+        return f"Selections({', '.join(repr(x) for x in self)})"
 
 class Selection(
     namedtuple("Selection", "start length")
