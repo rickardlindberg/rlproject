@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.generic import Selections
+
 class String(
     namedtuple("String", "string selections")
 ):
@@ -73,11 +75,6 @@ class String(
                 start=self.selections[-1].start+5,
                 length=-5
             )]))
-
-class Selections(tuple):
-
-    def __repr__(self):
-        return f"Selections({', '.join(repr(x) for x in self)})"
 
 class Selection(
     namedtuple("Selection", "start length")
