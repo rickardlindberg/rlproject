@@ -5,6 +5,16 @@ class Lines(
 ):
     pass
 
+class LinesProjection:
+
+    @property
+    def lines(self):
+        return self.projected_lines.lines
+
+    @property
+    def selections(self):
+        return self.projected_lines.selections
+
 class Selection(
     namedtuple("Selection", "start end")
 ):
