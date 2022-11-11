@@ -5,7 +5,12 @@ from rlprojectlib.domains.generic import Coordinate
 class TerminalText(
     namedtuple("TerminalText", "fragments cursors"),
 ):
-    pass
+
+    def print_fragments_and_cursors(self):
+        for fragment in self.fragments:
+            print(fragment)
+        for cursor in self.cursors:
+            print(cursor)
 
 class TerminalTextProjection:
 
@@ -16,6 +21,9 @@ class TerminalTextProjection:
     @property
     def cursors(self):
         return self.terminal_text.cursors
+
+    def print_fragments_and_cursors(self):
+        self.terminal_text.print_fragments_and_cursors()
 
 class TerminalCursor(
     namedtuple("TerminalCursor", "x y"),

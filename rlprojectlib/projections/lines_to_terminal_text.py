@@ -57,13 +57,9 @@ class LinesToTerminalText(
 
     @staticmethod
     def test_project(lines, selections=[]):
-        terminal_text = LinesToTerminalText.project(
+        LinesToTerminalText.project(
             Lines(lines=lines, selections=Selections(selections))
-        ).terminal_text
-        for fragment in terminal_text.fragments:
-            print(fragment)
-        for cursor in terminal_text.cursors:
-            print(cursor)
+        ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
         return LinesToTerminalText.project(self.lines.keyboard_event(event))

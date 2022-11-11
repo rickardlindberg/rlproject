@@ -56,15 +56,11 @@ class StringToTerminalText(
 
     @staticmethod
     def test_project(string, selection_start=0, selection_length=0):
-        terminal_text = StringToTerminalText.project(
+        StringToTerminalText.project(
             String(
                 string,
                 Selections([
                     Selection(start=selection_start, length=selection_length)
                 ])
             )
-        ).terminal_text
-        for fragment in terminal_text.fragments:
-            print(fragment)
-        for cursor in terminal_text.cursors:
-            print(cursor)
+        ).print_fragments_and_cursors()
