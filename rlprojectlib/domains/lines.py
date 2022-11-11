@@ -1,10 +1,18 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.generic import SuperTuple, Selections
 from rlprojectlib.domains.string import Selection as StringSelection
 
 class Lines(
     namedtuple("Lines", "lines selections")
 ):
+
+    @staticmethod
+    def create(lines, selections):
+        return Lines(
+            lines=SuperTuple(lines),
+            selections=Selections(selections)
+        )
 
     def print_lines_selections(self):
         self.lines.print()

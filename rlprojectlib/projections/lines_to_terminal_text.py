@@ -58,7 +58,7 @@ class LinesToTerminalText(
     @staticmethod
     def test_project(lines, selections=[]):
         LinesToTerminalText.project(
-            Lines(lines=lines, selections=Selections(selections))
+            Lines.create(lines=lines, selections=selections)
         ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
