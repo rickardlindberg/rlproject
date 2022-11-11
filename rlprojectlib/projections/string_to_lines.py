@@ -63,15 +63,9 @@ class StringToLines(
 
     @staticmethod
     def test_project(string, start=0):
-        lines = StringToLines.project(
+        StringToLines.project(
             String.from_string(string=string, selection_start=start)
-        ).projected_lines
-        for line in lines.lines:
-            print(line)
-        print_namedtuples(lines.selections)
+        ).print_lines_selections()
 
     def keyboard_event(self, event):
         return StringToLines.project(self.string.keyboard_event(event))
-
-def print_namedtuples(namedtuples):
-    print("\n".join(repr(x) for x in namedtuples))

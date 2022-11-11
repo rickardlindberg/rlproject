@@ -5,7 +5,12 @@ from rlprojectlib.domains.string import Selection as StringSelection
 class Lines(
     namedtuple("Lines", "lines selections")
 ):
-    pass
+
+    def print_lines_selections(self):
+        for line in self.lines:
+            print(line)
+        for selection in self.selections:
+            print(selection)
 
 class Line(
     namedtuple("Line", "text number")
@@ -21,6 +26,9 @@ class LinesProjection:
     @property
     def selections(self):
         return self.projected_lines.selections
+
+    def print_lines_selections(self):
+        self.projected_lines.print_lines_selections()
 
 class Selection(
     namedtuple("Selection", "start end")
