@@ -55,10 +55,5 @@ class StringToTerminalText(
             string=string
         )
 
-    def keyboard_event(self, event):
-        return StringToTerminalText.project(
-            self.string.move_cursor_forward()
-        )
-
 def print_namedtuples(namedtuples):
     print("\n".join(repr(x) for x in namedtuples))
