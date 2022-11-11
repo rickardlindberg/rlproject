@@ -5,6 +5,11 @@ class Lines(
 ):
     pass
 
+class Line(
+    namedtuple("Line", "text number")
+):
+    pass
+
 class LinesProjection:
 
     @property

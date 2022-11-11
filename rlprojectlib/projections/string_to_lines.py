@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.string import String
-from rlprojectlib.domains.lines import Lines, Selection, Position, LinesProjection
+from rlprojectlib.domains.lines import Lines, Line, Selection, Position, LinesProjection
 from rlprojectlib.domains.generic import Selections
 
 class StringToLines(
@@ -13,15 +13,18 @@ class StringToLines(
     def project(string):
         """
         >>> StringToLines.test_project("one\\ntwo")
-        ('one', 'two')
+        Line(text='one', number=1)
+        Line(text='two', number=2)
         Selection(start=Position(row=0, col=0), end=Position(row=0, col=0))
 
         >>> StringToLines.test_project("one\\ntwo", 3)
-        ('one', 'two')
+        Line(text='one', number=1)
+        Line(text='two', number=2)
         Selection(start=Position(row=0, col=3), end=Position(row=0, col=3))
 
         >>> StringToLines.test_project("one\\ntwo", 4)
-        ('one', 'two')
+        Line(text='one', number=1)
+        Line(text='two', number=2)
         Selection(start=Position(row=1, col=0), end=Position(row=1, col=0))
         """
         lines = []
@@ -30,7 +33,7 @@ class StringToLines(
             match_index = string.string.find("\n", pos)
             if match_index >= 0:
                 lines.append((
-                    string.string[pos:match_index],
+                    Line(text=string.string[pos:match_index], number=len(lines)+1),
                     pos,
                     match_index
                 ))
@@ -38,7 +41,7 @@ class StringToLines(
             else:
                 break
         lines.append((
-            string.string[pos:len(string.string)],
+            Line(text=string.string[pos:len(string.string)], number=len(lines)+1),
             pos,
             len(string.string)
         ))
@@ -63,7 +66,8 @@ class StringToLines(
         lines = StringToLines.project(
             String.from_string(string=string, selection_start=start)
         ).projected_lines
-        print(lines.lines)
+        for line in lines.lines:
+            print(line)
         print_namedtuples(lines.selections)
 
     def keyboard_event(self, event):
