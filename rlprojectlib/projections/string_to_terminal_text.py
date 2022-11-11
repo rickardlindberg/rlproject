@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.generic import Selections
 from rlprojectlib.domains.string import String, Selection
 from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, TerminalTextFragmentsBuilder, TerminalCursor
 
@@ -11,19 +12,17 @@ class StringToTerminalText(
     """
     I project a String to a TerminalText.
 
-    I project keyboard events back to the String.
-
-    >>> terminal_text = StringToTerminalText.project(String("hello", [Selection(1, 3)]))
-    >>> print_namedtuples(terminal_text.fragments)
+    >>> StringToTerminalText.test_project("hello", 1, 3)
     TerminalTextFragment(x=0, y=0, text='h', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='ell', bold=None, bg='YELLOW', fg=None)
     TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
+    TerminalCursor(x=4, y=0)
 
-    >>> terminal_text = StringToTerminalText.project(String("1\\n2", [Selection(1, 0)]))
-    >>> print_namedtuples(terminal_text.fragments)
+    >>> StringToTerminalText.test_project("1\\n2", 1, 0)
     TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
     TerminalTextFragment(x=1, y=0, text='\\\\n', bold=None, bg=None, fg='MAGENTA')
     TerminalTextFragment(x=3, y=0, text='2', bold=None, bg=None, fg=None)
+    TerminalCursor(x=1, y=0)
     """
 
     @staticmethod
@@ -55,5 +54,17 @@ class StringToTerminalText(
             string=string
         )
 
-def print_namedtuples(namedtuples):
-    print("\n".join(repr(x) for x in namedtuples))
+    @staticmethod
+    def test_project(string, selection_start=0, selection_length=0):
+        terminal_text = StringToTerminalText.project(
+            String(
+                string,
+                Selections([
+                    Selection(start=selection_start, length=selection_length)
+                ])
+            )
+        ).terminal_text
+        for fragment in terminal_text.fragments:
+            print(fragment)
+        for cursor in terminal_text.cursors:
+            print(cursor)
