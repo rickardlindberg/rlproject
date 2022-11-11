@@ -1,16 +1,14 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import Coordinate
+from rlprojectlib.domains.generic import Coordinate, SuperTuple
 
 class TerminalText(
     namedtuple("TerminalText", "fragments cursors"),
 ):
 
     def print_fragments_and_cursors(self):
-        for fragment in self.fragments:
-            print(fragment)
-        for cursor in self.cursors:
-            print(cursor)
+        self.fragments.print()
+        self.cursors.print()
 
 class TerminalTextProjection:
 
@@ -45,12 +43,12 @@ class TerminalTextFragment(
 
     def split(self, separator, **styling_kwargs):
         """
-        >>> print_namedtuples(TerminalTextFragment(0, 0, "hello").split("ll", text="||", fg="YELLOW"))
+        >>> TerminalTextFragment(0, 0, "hello").split("ll", text="||", fg="YELLOW").print()
         TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
-        >>> print_namedtuples(TerminalTextFragment(0, 0, "n2").split("n", text="N"))
+        >>> TerminalTextFragment(0, 0, "n2").split("n", text="N").print()
         TerminalTextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
         TerminalTextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
         """
@@ -60,7 +58,7 @@ class TerminalTextFragment(
             if index > 0:
                 next_x += fragments.add(self._replace(x=next_x, **styling_kwargs))
             next_x += fragments.add(self._replace(x=next_x, text=subtext))
-        return fragments.to_tuple()
+        return fragments.to_immutable()
 
 class TerminalTextFragmentsBuilder:
 
@@ -75,13 +73,10 @@ class TerminalTextFragmentsBuilder:
     def extend(self, fragments):
         return sum(self.add(x) for x in fragments)
 
-    def to_tuple(self):
-        return tuple(self.fragments)
+    def to_immutable(self):
+        return SuperTuple(self.fragments)
 
 class KeyboardEvent(
     namedtuple("KeyboardEvent", "unicode_character")
 ):
     pass
-
-def print_namedtuples(namedtuples):
-    print("\n".join(repr(x) for x in namedtuples))

@@ -3,7 +3,7 @@ from collections import namedtuple
 from rlprojectlib.domains.string import Selection as StringSelection
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.lines import Lines, Line, Selection, Position
-from rlprojectlib.domains.generic import Selections
+from rlprojectlib.domains.generic import Selections, SuperTuple
 from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment
 from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
 
@@ -51,7 +51,7 @@ class LinesToTerminalText(
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
         return LinesToTerminalText(
-            projection=TerminalText(fragments=fragments, cursors=cursors),
+            projection=TerminalText(fragments=SuperTuple(fragments), cursors=SuperTuple(cursors)),
             lines=lines,
         )
 

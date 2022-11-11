@@ -7,10 +7,8 @@ class Lines(
 ):
 
     def print_lines_selections(self):
-        for line in self.lines:
-            print(line)
-        for selection in self.selections:
-            print(selection)
+        self.lines.print()
+        self.selections.print()
 
 class LinesProjection:
 

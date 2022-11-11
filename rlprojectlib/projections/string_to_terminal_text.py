@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import Selections
+from rlprojectlib.domains.generic import Selections, SuperTuple
 from rlprojectlib.domains.string import String, Selection
 from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, TerminalTextFragmentsBuilder, TerminalCursor
 
@@ -50,7 +50,7 @@ class StringToTerminalText(
             x=x
         ).replace_newlines(fg="MAGENTA"))
         return StringToTerminalText(
-            projection=TerminalText(fragments=fragments.to_tuple(), cursors=cursors),
+            projection=TerminalText(fragments=fragments.to_immutable(), cursors=SuperTuple(cursors)),
             string=string
         )
 

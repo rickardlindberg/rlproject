@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.lines import Lines, Line, Selection, Position, LinesProjection
-from rlprojectlib.domains.generic import Selections
+from rlprojectlib.domains.generic import Selections, SuperTuple
 
 class StringToLines(
     namedtuple("StringToLines", "projection string"),
@@ -55,7 +55,7 @@ class StringToLines(
             selections.append(Selection(start=start, end=end))
         return StringToLines(
             projection=Lines(
-                lines=tuple(line[0] for line in lines),
+                lines=SuperTuple(line[0] for line in lines),
                 selections=Selections(selections)
             ),
             string=string,
