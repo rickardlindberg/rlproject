@@ -40,10 +40,10 @@ class LinesToTerminalText(
         line_number_len = max(len(str(line.number)) for line in lines.lines)
         selections_per_line = {}
         for selection in lines.selections:
-            selections_per_line[selection.start.row] = [
-                StringSelection(start=selection.start.col, length=selection.end.col-selection.start.col)
-            ]
-
+            for index, selection in selection.string_selections:
+                if index not in selections_per_line:
+                    selections_per_line[index] = []
+                selections_per_line[index].append(selection)
         for index, line in enumerate(lines.lines):
             y = String(string=line.text, selections=Selections(selections_per_line.get(index, [])))
             x = StringToTerminalText.project(y, y=index, x=line_number_len+1)
