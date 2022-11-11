@@ -5,7 +5,7 @@ from rlprojectlib.domains.lines import Lines, Line, Selection, Position, LinesPr
 from rlprojectlib.domains.generic import Selections
 
 class StringToLines(
-    namedtuple("StringToLines", "string projected_lines"),
+    namedtuple("StringToLines", "projection string"),
     LinesProjection
 ):
 
@@ -54,11 +54,11 @@ class StringToLines(
                     end = Position(row=row, col=selection.pos_end-x)
             selections.append(Selection(start=start, end=end))
         return StringToLines(
-            string=string,
-            projected_lines=Lines(
+            projection=Lines(
                 lines=tuple(line[0] for line in lines),
                 selections=Selections(selections)
-            )
+            ),
+            string=string,
         )
 
     @staticmethod

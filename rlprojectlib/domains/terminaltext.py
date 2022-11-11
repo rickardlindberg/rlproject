@@ -16,14 +16,14 @@ class TerminalTextProjection:
 
     @property
     def fragments(self):
-        return self.terminal_text.fragments
+        return self.projection.fragments
 
     @property
     def cursors(self):
-        return self.terminal_text.cursors
+        return self.projection.cursors
 
     def print_fragments_and_cursors(self):
-        self.terminal_text.print_fragments_and_cursors()
+        self.projection.print_fragments_and_cursors()
 
 class TerminalCursor(
     namedtuple("TerminalCursor", "x y"),

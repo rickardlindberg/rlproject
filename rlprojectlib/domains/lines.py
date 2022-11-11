@@ -12,23 +12,23 @@ class Lines(
         for selection in self.selections:
             print(selection)
 
-class Line(
-    namedtuple("Line", "text number")
-):
-    pass
-
 class LinesProjection:
 
     @property
     def lines(self):
-        return self.projected_lines.lines
+        return self.projection.lines
 
     @property
     def selections(self):
-        return self.projected_lines.selections
+        return self.projection.selections
 
     def print_lines_selections(self):
-        self.projected_lines.print_lines_selections()
+        self.projection.print_lines_selections()
+
+class Line(
+    namedtuple("Line", "text number")
+):
+    pass
 
 class Selection(
     namedtuple("Selection", "start end")

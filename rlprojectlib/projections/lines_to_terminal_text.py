@@ -8,7 +8,7 @@ from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjecti
 from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
 
 class LinesToTerminalText(
-    namedtuple("LinesToTerminalText", "terminal_text lines"),
+    namedtuple("LinesToTerminalText", "projection lines"),
     TerminalTextProjection
 ):
 
@@ -51,8 +51,8 @@ class LinesToTerminalText(
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
         return LinesToTerminalText(
-            terminal_text=TerminalText(fragments=fragments, cursors=cursors),
-            lines=lines
+            projection=TerminalText(fragments=fragments, cursors=cursors),
+            lines=lines,
         )
 
     @staticmethod

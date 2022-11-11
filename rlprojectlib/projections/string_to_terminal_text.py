@@ -5,7 +5,7 @@ from rlprojectlib.domains.string import String, Selection
 from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, TerminalTextFragmentsBuilder, TerminalCursor
 
 class StringToTerminalText(
-    namedtuple("StringToTerminalText", "terminal_text string"),
+    namedtuple("StringToTerminalText", "projection string"),
     TerminalTextProjection
 ):
 
@@ -50,7 +50,7 @@ class StringToTerminalText(
             x=x
         ).replace_newlines(fg="MAGENTA"))
         return StringToTerminalText(
-            terminal_text=TerminalText(fragments=fragments.to_tuple(), cursors=cursors),
+            projection=TerminalText(fragments=fragments.to_tuple(), cursors=cursors),
             string=string
         )
 
