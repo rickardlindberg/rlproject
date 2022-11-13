@@ -80,3 +80,8 @@ class KeyboardEvent(
     namedtuple("KeyboardEvent", "unicode_character")
 ):
     pass
+
+class SizeEvent(
+    namedtuple("SizeEvent", "width height")
+):
+    pass

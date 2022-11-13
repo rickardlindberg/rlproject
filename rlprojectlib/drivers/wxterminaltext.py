@@ -1,6 +1,6 @@
 import wx
 
-from rlprojectlib.domains.terminaltext import KeyboardEvent
+from rlprojectlib.domains.terminaltext import KeyboardEvent, SizeEvent
 
 class WxTerminalTextDriver(wx.Panel):
 
@@ -42,6 +42,10 @@ class WxTerminalTextDriver(wx.Panel):
         self.repaint_bitmap()
 
     def on_size(self, evt):
+        width, height = self.repaint_bitmap()
+        self.terminal_text = self.terminal_text.size_event(
+            SizeEvent(width=width, height=height)
+        )
         self.repaint_bitmap()
 
     def on_char(self, evt):
@@ -110,6 +114,7 @@ class WxTerminalTextDriver(wx.Panel):
             ))
         self.reset_cursor_blink()
         self.force_repaint_window()
+        return (width // char_width, height // char_height)
 
     def reset_cursor_blink(self):
         self.show_cursors = True
