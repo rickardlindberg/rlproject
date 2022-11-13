@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.generic import SuperTuple
-from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment
+from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, SizeEvent
 
 class Editor(
     namedtuple("Editor", "projection terminal_text width"),
@@ -40,6 +40,9 @@ class Editor(
 
     def size_event(self, event):
         return Editor.project(
-            terminal_text=self.terminal_text,
+            terminal_text=self.terminal_text.size_event(SizeEvent(
+                width=event.width,
+                height=event.height-1
+            )),
             width=event.width
         )

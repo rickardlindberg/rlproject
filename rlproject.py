@@ -19,6 +19,7 @@ if __name__ == "__main__":
             "rlprojectlib.domains.terminaltext",
             "rlprojectlib.projections",
             "rlprojectlib.projections.editor",
+            "rlprojectlib.projections.split",
             "rlprojectlib.projections.lines_to_terminal_text",
             "rlprojectlib.projections.string_to_lines",
             "rlprojectlib.projections.string_to_terminal_text",
@@ -33,15 +34,22 @@ if __name__ == "__main__":
     else:
         from rlprojectlib.drivers.wxterminaltext import WxTerminalTextDriver
         from rlprojectlib.projections.editor import Editor
+        from rlprojectlib.projections.split import Split
         from rlprojectlib.projections.lines_to_terminal_text import LinesToTerminalText
         from rlprojectlib.projections.string_to_lines import StringToLines
+        from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
         from rlprojectlib.domains.string import String
         WxTerminalTextDriver.run(
             Editor.project(
-                LinesToTerminalText.project(
-                    StringToLines.project(
+                Split.project([
+                    LinesToTerminalText.project(
+                        StringToLines.project(
+                            String.from_file("rlproject.py")
+                        )
+                    ),
+                    StringToTerminalText.project(
                         String.from_file("rlproject.py")
-                    )
-                )
+                    ),
+                ])
             )
         )

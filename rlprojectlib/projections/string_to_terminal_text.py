@@ -64,3 +64,8 @@ class StringToTerminalText(
                 ])
             )
         ).print_fragments_and_cursors()
+
+    def keyboard_event(self, event):
+        return StringToTerminalText.project(
+            self.string.keyboard_event(event)
+        )
