@@ -5,6 +5,9 @@ class Coordinate:
 
 class SuperTuple(tuple):
 
+    def add(self, item):
+        return SuperTuple(self+(item,))
+
     def map(self, fn):
         return SuperTuple([fn(x) for x in self])
 

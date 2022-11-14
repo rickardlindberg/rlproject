@@ -1,7 +1,11 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.generic import SuperTuple
-from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextProjection, TerminalTextFragment, SizeEvent
+from rlprojectlib.domains.terminaltext import SizeEvent
+from rlprojectlib.domains.terminaltext import TerminalCursor
+from rlprojectlib.domains.terminaltext import TerminalText
+from rlprojectlib.domains.terminaltext import TerminalTextFragment
+from rlprojectlib.domains.terminaltext import TerminalTextProjection
 
 class Editor(
     namedtuple("Editor", "projection terminal_text width"),
@@ -9,23 +13,27 @@ class Editor(
 ):
 
     @staticmethod
-    def project(terminal_text, unicode_character=None, width=0):
+    def project(terminal_text, event=None, width=0):
         """
-        >>> Editor.project(TerminalText(fragments=SuperTuple([]), cursors=SuperTuple([]))).print_fragments_and_cursors()
-        TerminalTextFragment(x=0, y=0, text='STATUS: None', bold=None, bg='MAGENTA', fg='WHITE')
+        I project a status bar followed by the given terminal text:
+
+        >>> Editor.project(TerminalText(
+        ...     fragments=SuperTuple([TerminalTextFragment(0, 0, "hello")]),
+        ...     cursors=SuperTuple([TerminalCursor(0, 0)])
+        ... )).print_fragments_and_cursors()
+        TerminalTextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=0, text='Event: None', bold=None, bg='MAGENTA', fg='WHITE')
+        TerminalCursor(x=0, y=1)
         """
         return Editor(
-            projection=TerminalText(
-                fragments=SuperTuple([
-                    TerminalTextFragment(
-                        text=f"STATUS: {repr(unicode_character)}".ljust(width),
-                        x=0,
-                        y=0,
-                        bg="MAGENTA",
-                        fg="WHITE"
-                    )
-                ]+[x.move(dy=1) for x in terminal_text.fragments]),
-                cursors=terminal_text.cursors.map(lambda x: x.move(dy=1))
+            projection=terminal_text.translate(dy=1).add_fragment(
+                TerminalTextFragment(
+                    text=f"Event: {repr(event)}".ljust(width),
+                    x=0,
+                    y=0,
+                    bg="MAGENTA",
+                    fg="WHITE"
+                )
             ),
             terminal_text=terminal_text,
             width=width
@@ -34,7 +42,7 @@ class Editor(
     def keyboard_event(self, event):
         return Editor.project(
             terminal_text=self.terminal_text.keyboard_event(event),
-            unicode_character=event.unicode_character,
+            event=event,
             width=self.width
         )
 
@@ -44,5 +52,6 @@ class Editor(
                 width=event.width,
                 height=event.height-1
             )),
+            event=event,
             width=event.width
         )

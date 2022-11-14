@@ -10,6 +10,17 @@ class TerminalText(
         self.fragments.print()
         self.cursors.print()
 
+    def translate(self, dy):
+        return self._replace(
+            fragments=self.fragments.map(lambda x: x.move(dy=dy)),
+            cursors=self.cursors.map(lambda x: x.move(dy=dy))
+        )
+
+    def add_fragment(self, fragment):
+        return self._replace(
+            fragments=self.fragments.add(fragment)
+        )
+
 class TerminalTextProjection:
 
     @property
@@ -22,6 +33,9 @@ class TerminalTextProjection:
 
     def print_fragments_and_cursors(self):
         self.projection.print_fragments_and_cursors()
+
+    def translate(self, dy):
+        return self.projection.translate(dy=dy)
 
 class TerminalCursor(
     namedtuple("TerminalCursor", "x y"),
