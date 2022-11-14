@@ -43,18 +43,17 @@ class WxTerminalTextDriver(wx.Panel):
 
     def on_size(self, evt):
         width, height = self.repaint_bitmap()
-        self.terminal_text = self.terminal_text.size_event(
-            SizeEvent(width=width, height=height)
-        )
+        self.terminal_text = self.terminal_text.size_event(SizeEvent(
+            width=width,
+            height=height
+        ))
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        new_document = self.terminal_text.keyboard_event(KeyboardEvent(
+        self.terminal_text = self.terminal_text.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
-        if new_document != self.terminal_text:
-            self.terminal_text = new_document
-            self.repaint_bitmap()
+        self.repaint_bitmap()
 
     def on_paint(self, event):
         dc = wx.AutoBufferedPaintDC(self)
