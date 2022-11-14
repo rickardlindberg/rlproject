@@ -20,7 +20,7 @@ class Split(
         ...     ]), cursors=SuperTuple([])),
         ... ], width=10, height=3).projection.print_fragments_and_cursors()
         TerminalTextFragment(x=0, y=0, text='one', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=0, y=1, text='----------', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=1, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
         TerminalTextFragment(x=0, y=2, text='two', bold=None, bg=None, fg=None)
         """
         builder = TerminalTextFragmentsBuilder()
@@ -29,7 +29,7 @@ class Split(
         dy = 0
         for terminal_text in terminal_texts:
             if dy > 0:
-                builder.add(TerminalTextFragment(0, dy, "-"*width))
+                builder.add(TerminalTextFragment(0, dy, "-"*width, bg="FOREGROUND", fg="BACKGROUND"))
                 dy += 1
             for fragment in terminal_text.fragments:
                 builder.add(fragment.move(dy=dy))
