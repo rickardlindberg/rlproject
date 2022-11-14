@@ -32,7 +32,8 @@ class Split(
                 builder.add(TerminalTextFragment(0, dy, "-"*width, bg="FOREGROUND", fg="BACKGROUND"))
                 dy += 1
             for fragment in terminal_text.fragments:
-                builder.add(fragment.move(dy=dy))
+                if fragment.y < step:
+                    builder.add(fragment.move(dy=dy))
             cursors.extend(terminal_text.cursors.map(lambda x: x.move(dy=dy)))
             dy += step
         return Split(
