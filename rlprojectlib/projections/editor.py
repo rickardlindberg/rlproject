@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+import time
+
 from rlprojectlib.domains.generic import SuperTuple
 from rlprojectlib.domains.terminaltext import SizeEvent
 from rlprojectlib.domains.terminaltext import TerminalCursor
@@ -13,7 +15,7 @@ class Editor(
 ):
 
     @staticmethod
-    def project(terminal_text, event=None, width=0):
+    def project(terminal_text, event=None, width=0, ms=0):
         """
         I project a status bar followed by the given terminal text:
 
@@ -22,13 +24,13 @@ class Editor(
         ...     cursors=SuperTuple([TerminalCursor(0, 0)])
         ... )).print_fragments_and_cursors()
         TerminalTextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=0, y=0, text='Event: None', bold=None, bg='MAGENTA', fg='WHITE')
+        TerminalTextFragment(x=0, y=0, text='Event: None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         TerminalCursor(x=0, y=1)
         """
         return Editor(
             projection=terminal_text.translate(dy=1).add_fragment(
                 TerminalTextFragment(
-                    text=f"Event: {repr(event)}".ljust(width),
+                    text=f"Event: {repr(event)} {ms}ms".ljust(width),
                     x=0,
                     y=0,
                     bg="MAGENTA",
@@ -40,18 +42,32 @@ class Editor(
         )
 
     def keyboard_event(self, event):
+        terminal_text, ms = measure_ms(lambda:
+            self.terminal_text.keyboard_event(event)
+        )
         return Editor.project(
-            terminal_text=self.terminal_text.keyboard_event(event),
+            terminal_text=terminal_text,
             event=event,
-            width=self.width
+            width=self.width,
+            ms=ms
         )
 
     def size_event(self, event):
-        return Editor.project(
-            terminal_text=self.terminal_text.size_event(SizeEvent(
+        terminal_text, ms = measure_ms(lambda:
+            self.terminal_text.size_event(SizeEvent(
                 width=event.width,
                 height=event.height-1
-            )),
-            event=event,
-            width=event.width
+            ))
         )
+        return Editor.project(
+            terminal_text=terminal_text,
+            event=event,
+            width=event.width,
+            ms=ms
+        )
+
+def measure_ms(fn):
+    t1 = time.perf_counter()
+    return_value = fn()
+    t2 = time.perf_counter()
+    return (return_value, int((t2-t1)*1000))
