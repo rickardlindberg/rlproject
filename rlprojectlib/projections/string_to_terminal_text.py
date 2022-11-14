@@ -69,3 +69,6 @@ class StringToTerminalText(
         return StringToTerminalText.project(
             self.string.keyboard_event(event)
         )
+
+    def size_event(self, event):
+        return self

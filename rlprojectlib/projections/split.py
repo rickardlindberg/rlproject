@@ -1,7 +1,10 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.generic import SuperTuple
-from rlprojectlib.domains.terminaltext import TerminalText, TerminalTextFragment, TerminalTextProjection, TerminalTextFragmentsBuilder
+from rlprojectlib.domains.terminaltext import TerminalText
+from rlprojectlib.domains.terminaltext import TerminalTextFragment
+from rlprojectlib.domains.terminaltext import TerminalTextFragmentsBuilder
+from rlprojectlib.domains.terminaltext import TerminalTextProjection
 
 class Split(
     namedtuple("Split", "projection terminal_texts width height"),
@@ -55,7 +58,7 @@ class Split(
 
     def size_event(self, event):
         return Split.project(
-            terminal_texts=self.terminal_texts,
+            terminal_texts=[x.size_event(event) for x in self.terminal_texts],
             width=event.width,
             height=event.height
         )

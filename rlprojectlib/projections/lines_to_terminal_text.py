@@ -63,3 +63,6 @@ class LinesToTerminalText(
 
     def keyboard_event(self, event):
         return LinesToTerminalText.project(self.lines.keyboard_event(event))
+
+    def size_event(self, event):
+        return self
