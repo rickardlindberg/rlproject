@@ -68,3 +68,6 @@ class StringToLines(
 
     def keyboard_event(self, event):
         return StringToLines.project(self.string.keyboard_event(event))
+
+    def size_event(self, event):
+        return StringToLines.project(self.string.size_event(event))
