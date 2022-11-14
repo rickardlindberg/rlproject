@@ -24,13 +24,13 @@ class Editor(
         ...     cursors=SuperTuple([TerminalCursor(0, 0)])
         ... )).print_fragments_and_cursors()
         TerminalTextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=0, y=0, text='Event: None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
+        TerminalTextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         TerminalCursor(x=0, y=1)
         """
         return Editor(
             projection=terminal_text.translate(dy=1).add_fragment(
                 TerminalTextFragment(
-                    text=f"Event: {repr(event)} {ms}ms".ljust(width),
+                    text=f"{event} {ms}ms".ljust(width),
                     x=0,
                     y=0,
                     bg="MAGENTA",
