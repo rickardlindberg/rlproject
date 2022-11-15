@@ -4,23 +4,32 @@ def example_document(path="rlproject.py"):
     """
     I can create an example document without crashing:
 
-    >>> _ = example_document()
+    >>> from rlprojectlib.domains.terminaltext import SizeEvent
+    >>> from rlprojectlib.domains.terminaltext import KeyboardEvent
+    >>> terminal_text = example_document()
+    >>> _ = terminal_text.size_event(SizeEvent(10, 10))
+    >>> _ = terminal_text.keyboard_event(KeyboardEvent('a'))
     """
+    from rlprojectlib.domains.string import String
+    from rlprojectlib.projections.clipscroll import ClipScroll
     from rlprojectlib.projections.editor import Editor
-    from rlprojectlib.projections.split import Split
     from rlprojectlib.projections.lines_to_terminal_text import LinesToTerminalText
+    from rlprojectlib.projections.split import Split
     from rlprojectlib.projections.string_to_lines import StringToLines
     from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
-    from rlprojectlib.domains.string import String
     return Editor.project(
         Split.project([
-            LinesToTerminalText.project(
-                StringToLines.project(
-                    String.from_file(path)
-                )
+            ClipScroll.project(
+                LinesToTerminalText.project(
+                    StringToLines.project(
+                        String.from_file(path)
+                    )
+                ),
             ),
-            StringToTerminalText.project(
-                String.from_file(path)
+            ClipScroll.project(
+                StringToTerminalText.project(
+                    String.from_file(path)
+                ),
             ),
         ])
     )
@@ -35,17 +44,18 @@ if __name__ == "__main__":
         for module in [
             "rlproject",
             "rlprojectlib",
-            "rlprojectlib.drivers",
-            "rlprojectlib.drivers.wxterminaltext",
             "rlprojectlib.domains",
             "rlprojectlib.domains.generic",
             "rlprojectlib.domains.lines",
             "rlprojectlib.domains.string",
             "rlprojectlib.domains.terminaltext",
+            "rlprojectlib.drivers",
+            "rlprojectlib.drivers.wxterminaltext",
             "rlprojectlib.projections",
+            "rlprojectlib.projections.clipscroll",
             "rlprojectlib.projections.editor",
-            "rlprojectlib.projections.split",
             "rlprojectlib.projections.lines_to_terminal_text",
+            "rlprojectlib.projections.split",
             "rlprojectlib.projections.string_to_lines",
             "rlprojectlib.projections.string_to_terminal_text",
         ]:
