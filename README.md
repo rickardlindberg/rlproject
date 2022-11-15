@@ -76,8 +76,6 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
 
 ---
 
-* Where to do convert keystrokes to actions?
-* Multiple cursors?
 * If editor is modal or not should only be reflected in key bindings
 
 * Operation 1: replace multiple words
@@ -93,6 +91,7 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
 
 * Word wrap projection
 
-* String should not handle key_event
-    * Project key_event -> string operations
-    * Project key_event -> lines operations
+* Where to convert keystrokes to actions?
+    * String should not handle key_event
+        * Project key_event -> string operations
+        * Project key_event -> lines operations
