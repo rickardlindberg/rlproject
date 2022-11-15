@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-def example_document():
+def example_document(path="rlproject.py"):
     """
     I can create an example document without crashing:
 
@@ -16,11 +16,11 @@ def example_document():
         Split.project([
             LinesToTerminalText.project(
                 StringToLines.project(
-                    String.from_file("rlproject.py")
+                    String.from_file(path)
                 )
             ),
             StringToTerminalText.project(
-                String.from_file("rlproject.py")
+                String.from_file(path)
             ),
         ])
     )
