@@ -71,6 +71,4 @@ class StringToTerminalText(
         )
 
     def size_event(self, event):
-        return StringToTerminalText.project(
-            self.string.size_event(event)
-        )
+        return self

@@ -30,9 +30,6 @@ class String(
         else:
             return self
 
-    def size_event(self, event):
-        return self
-
     def replace(self, text):
         """
         >>> String.from_string("hello", selection_length=1).replace("1").string
