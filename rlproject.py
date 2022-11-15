@@ -1,5 +1,30 @@
 #!/usr/bin/env python3
 
+def example_document():
+    """
+    I can create an example document without crashing:
+
+    >>> _ = example_document()
+    """
+    from rlprojectlib.projections.editor import Editor
+    from rlprojectlib.projections.split import Split
+    from rlprojectlib.projections.lines_to_terminal_text import LinesToTerminalText
+    from rlprojectlib.projections.string_to_lines import StringToLines
+    from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
+    from rlprojectlib.domains.string import String
+    return Editor.project(
+        Split.project([
+            LinesToTerminalText.project(
+                StringToLines.project(
+                    String.from_file("rlproject.py")
+                )
+            ),
+            StringToTerminalText.project(
+                String.from_file("rlproject.py")
+            ),
+        ])
+    )
+
 if __name__ == "__main__":
     import sys
     if "--test" in sys.argv[1:]:
@@ -33,23 +58,4 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         from rlprojectlib.drivers.wxterminaltext import WxTerminalTextDriver
-        from rlprojectlib.projections.editor import Editor
-        from rlprojectlib.projections.split import Split
-        from rlprojectlib.projections.lines_to_terminal_text import LinesToTerminalText
-        from rlprojectlib.projections.string_to_lines import StringToLines
-        from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
-        from rlprojectlib.domains.string import String
-        WxTerminalTextDriver.run(
-            Editor.project(
-                Split.project([
-                    LinesToTerminalText.project(
-                        StringToLines.project(
-                            String.from_file("rlproject.py")
-                        )
-                    ),
-                    StringToTerminalText.project(
-                        String.from_file("rlproject.py")
-                    ),
-                ])
-            )
-        )
+        WxTerminalTextDriver.run(example_document())
