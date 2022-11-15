@@ -68,7 +68,7 @@ class String(
         """
         if abs(self.selections[-1].length) > 0:
             return self._replace(selections=Selections(
-                list(self.selections)+[self.selections[-1].move_forward(abs(self.selections[-1].length))]
+                list(self.selections)+[self.selections[-1].move_forward(abs(self.selections[-1].length)+3)]
             ))
         else:
             return self._replace(selections=Selections([Selection(
