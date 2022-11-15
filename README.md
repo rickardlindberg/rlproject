@@ -91,8 +91,8 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
         * Show only lines matching filters
     * Cursor and edit operations should only work on filtered lines
 
-* Line number projection
-
 * Word wrap projection
 
-* Status line at the bottom
+* String should not handle key_event
+    * Project key_event -> string operations
+    * Project key_event -> lines operations
