@@ -10,10 +10,10 @@ class TerminalText(
         self.fragments.print()
         self.cursors.print()
 
-    def translate(self, dy):
+    def translate(self, dx=0, dy=0):
         return self._replace(
-            fragments=self.fragments.map(lambda x: x.move(dy=dy)),
-            cursors=self.cursors.map(lambda x: x.move(dy=dy))
+            fragments=self.fragments.map(lambda x: x.move(dx=dx, dy=dy)),
+            cursors=self.cursors.map(lambda x: x.move(dx=dx, dy=dy))
         )
 
     def clip(self, width, height):
@@ -23,7 +23,7 @@ class TerminalText(
                 fragments.add(fragment.clip(width))
         cursors = []
         for cursor in self.cursors:
-            if cursor.x < width and cursor.y < height:
+            if cursor.x <= width and cursor.y < height:
                 cursors.append(cursor)
         return TerminalText(
             fragments=fragments.to_immutable(),
@@ -48,8 +48,8 @@ class TerminalTextProjection:
     def print_fragments_and_cursors(self):
         self.projection.print_fragments_and_cursors()
 
-    def translate(self, dy):
-        return self.projection.translate(dy=dy)
+    def translate(self, *args, **kwargs):
+        return self.projection.translate(*args, **kwargs)
 
     def clip(self, *args, **kwargs):
         return self.projection.clip(*args, **kwargs)
@@ -70,7 +70,25 @@ class TerminalTextFragment(
 ):
 
     def clip(self, width):
-        return self._replace(text=self.text[:width-self.x])
+        """
+        >>> TerminalTextFragment(0, 0, "hello").clip(2)
+        TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
+
+        >>> TerminalTextFragment(-2, 0, "hello").clip(2)
+        TerminalTextFragment(x=0, y=0, text='ll', bold=None, bg=None, fg=None)
+
+        >>> TerminalTextFragment(1, 0, "hello").clip(2)
+        TerminalTextFragment(x=1, y=0, text='h', bold=None, bg=None, fg=None)
+        """
+        if self.x < 0:
+            start = -self.x
+            end = start + width
+            x = 0
+        else:
+            start = 0
+            end = width - self.x
+            x = self.x
+        return self._replace(text=self.text[start:end], x=x)
 
     def replace_newlines(self, **styling_kwargs):
         return self.split("\n", text="\\n", **styling_kwargs)

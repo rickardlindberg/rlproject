@@ -1,7 +1,7 @@
 class Coordinate:
 
-    def move(self, dy):
-        return self._replace(y=self.y+dy)
+    def move(self, dx=0, dy=0):
+        return self._replace(x=self.x+dx, y=self.y+dy)
 
 class SuperTuple(tuple):
 
