@@ -14,10 +14,10 @@ editing operations for different data structures.
 
 ## Demos
 
-[Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)
-
 <center>
-[![Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)](https://youtu.be/GUX3DQjVg4c)
+[![Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)](https://youtu.be/GUX3DQjVg4c "Demo of new project that explores projectional, structured editing.")
+
+[Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)
 </center>
 
 ## Inspiration
