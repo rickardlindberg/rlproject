@@ -16,6 +16,20 @@ class TerminalText(
             cursors=self.cursors.map(lambda x: x.move(dy=dy))
         )
 
+    def clip(self, width, height):
+        fragments = TerminalTextFragmentsBuilder()
+        for fragment in self.fragments:
+            if fragment.y < height:
+                fragments.add(fragment.clip(width))
+        cursors = []
+        for cursor in self.cursors:
+            if cursor.x < width and cursor.y < height:
+                cursors.append(cursor)
+        return TerminalText(
+            fragments=fragments.to_immutable(),
+            cursors=SuperTuple(cursors)
+        )
+
     def add_fragment(self, fragment):
         return self._replace(
             fragments=self.fragments.add(fragment)
@@ -37,6 +51,9 @@ class TerminalTextProjection:
     def translate(self, dy):
         return self.projection.translate(dy=dy)
 
+    def clip(self, *args, **kwargs):
+        return self.projection.clip(*args, **kwargs)
+
 class TerminalCursor(
     namedtuple("TerminalCursor", "x y"),
     Coordinate
@@ -51,6 +68,9 @@ class TerminalTextFragment(
     ),
     Coordinate
 ):
+
+    def clip(self, width):
+        return self._replace(text=self.text[:width-self.x])
 
     def replace_newlines(self, **styling_kwargs):
         return self.split("\n", text="\\n", **styling_kwargs)

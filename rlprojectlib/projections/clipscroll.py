@@ -16,7 +16,7 @@ class ClipScroll(
         """
         """
         return ClipScroll(
-            projection=terminal_text,
+            projection=terminal_text.clip(width, height),
             terminal_text=terminal_text,
             width=width,
             height=height
