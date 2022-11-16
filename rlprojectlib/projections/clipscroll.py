@@ -23,12 +23,12 @@ class ClipScroll(
         ...     width=2,
         ...     height=1,
         ... ).projection.print_fragments_and_cursors()
-        TerminalTextFragment(x=0, y=0, text='lo', bold=None, bg=None, fg=None)
-        TerminalCursor(x=2, y=0)
+        TerminalTextFragment(x=0, y=0, text='o', bold=None, bg=None, fg=None)
+        TerminalCursor(x=1, y=0)
         """
         visible_cursor = terminal_text.cursors[-1]
-        if visible_cursor.x > width:
-            dx = width - visible_cursor.x
+        if visible_cursor.x >= width:
+            dx = width - visible_cursor.x - 1
         else:
             dx = 0
         if visible_cursor.y >= height:
