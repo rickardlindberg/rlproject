@@ -1,27 +1,30 @@
-I want to try and implement a projectional editor.
+I am building a projectional editor!
 
-Inspiration: https://github.com/projectured/projectured
+I am doing it both to explore the architecture of a projectional editor and
+also to see if a projectional editor could be useful for me in some contexts.
 
-Plain file ->
-Parsed structure ->
-Projected as graphics (plus cursor) ->
-Keyboard triggers change in parsed structure ->
-    Parsed structure is rendered back to plain file
-    +
-    Parsed structure is projected again
+## What is a projectional editor?
 
-The graphical projection is a tree of boxes. Each box can have different layout
-constraints and algorithms. Boxes are cached. Id of immutable parsed
-structure.
+A projectional editor differs from a text editor in that it can project the
+data structure being edited in multiple ways. It is not limited to syntax
+highlighted lines of text for example.
 
-* Should not manage windows, leave that to window manager
+It can provide custom projections for different scenarios and provide custom
+editing operations for different data structures.
 
-https://research.swtch.com/acme
-https://research.swtch.com/acme.pdf
+## Inspiration
 
-Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
+My first inspiration for this projects is
+[ProjecturEd](https://github.com/projectured/projectured).
 
----
+Basically I want to build my own version of ProjecturEd. It is written in some
+version of Lisp, and I found the codebase difficult to read. It's
+documentation however gives a good enough view of the architecture, that I can
+try to implement something like that.
+
+## Research
+
+### ProjecturEd
 
 https://github.com/projectured/projectured/wiki:
 
@@ -45,9 +48,9 @@ https://github.com/projectured/projectured/wiki:
 
     * SDL backend needs WIDGET/COMPOSITE?
 
----
+### ProjectIt
 
-https://www.projectit.org/010_Intro/010_Projectional_Editing
+https://www.projectit.org/010_Intro/010_Projectional_Editing:
 
 > The essential characteristic of projectional editing is that the user
 > manipulates the Abstract Syntax Tree (AST) directly. In contrast, the
@@ -62,21 +65,49 @@ https://www.projectit.org/010_Intro/010_Projectional_Editing
 
 https://www.projectit.org/030_Developing_a_Language/030_API_Level/020_Writing_Projections
 
----
+### Forest
 
 https://github.com/tehwalris/forest
 
 https://www.youtube.com/watch?v=ze_nJlKkckg
 
-* Multiple cursors
+I got the idea for multiple cursors from Forest.
 
----
+After watching the Forste demo, I remembered that Sublime Text (which I have
+never used) had multiple cursors as well. I learned a bit about it through
+[Exploring The Power Of Multiple Cursors And Selections In Sublime Text
+3](https://www.bennadel.com/blog/3798-exploring-the-power-of-multiple-cursors-and-selections-in-sublime-text-3.htm).
+
+### Acme
+
+I watched a demo of Acme and thought it was an interesting editor.
+
+Perhaps some of its ideas are applicable to a projectional editor?
+
+https://research.swtch.com/acme
+https://research.swtch.com/acme.pdf
+
+## Notes
+
+* Should not manage windows, leave that to window manager?
 
 * You always edit the bottom most document
 
----
-
 * If editor is modal or not should only be reflected in key bindings
+
+* The graphical projection is a tree of boxes. Each box can have different
+  layout constraints and algorithms. Boxes are cached. Id of immutable parsed
+  structure.
+
+## Use cases
+
+* Editing structured file
+    * Plain file ->
+    * Parsed structure ->
+    * Projected as graphics (plus cursor) ->
+    * Keyboard triggers change in parsed structure ->
+        * Parsed structure is rendered back to plain file
+        * Parsed structure is projected again
 
 * Operation 1: replace multiple words
     * Move cursor to word
@@ -90,6 +121,10 @@ https://www.youtube.com/watch?v=ze_nJlKkckg
     * Cursor and edit operations should only work on filtered lines
 
 * Word wrap projection
+
+* Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
+
+## TODO
 
 * Where to convert keystrokes to actions?
     * String should not handle key_event
