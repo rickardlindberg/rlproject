@@ -19,19 +19,19 @@ class LinesToTerminalText(
         ...     Line(text="one", number=1),
         ...     Line(text="two", number=2),
         ... ])
-        TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=2, y=0, text='one', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=0, y=1, text='2', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=1, text='2', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=2, y=1, text='two', bold=None, bg=None, fg=None)
 
         >>> LinesToTerminalText.test_project([
         ...     Line(text="one", number=1),
         ...     Line(text="two", number=2),
         ... ], [Selection(start=Position(row=0, col=0), end=Position(row=0, col=1))])
-        TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=0, text='1', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=2, y=0, text='o', bold=None, bg='YELLOW', fg=None)
         TerminalTextFragment(x=3, y=0, text='ne', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=0, y=1, text='2', bold=None, bg=None, fg=None)
+        TerminalTextFragment(x=0, y=1, text='2', bold=None, bg=None, fg='YELLOW')
         TerminalTextFragment(x=2, y=1, text='two', bold=None, bg=None, fg=None)
         TerminalCursor(x=3, y=0)
         """
@@ -47,7 +47,7 @@ class LinesToTerminalText(
         for index, line in enumerate(lines.lines):
             y = String(string=line.text, selections=Selections(selections_per_line.get(index, [])))
             x = StringToTerminalText.project(y, y=index, x=line_number_len+1)
-            fragments.append(TerminalTextFragment(x=0, y=index, text=str(line.number)))
+            fragments.append(TerminalTextFragment(x=0, y=index, text=str(line.number), fg="YELLOW"))
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
         return LinesToTerminalText(
