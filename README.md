@@ -12,6 +12,14 @@ highlighted lines of text for example.
 It can provide custom projections for different scenarios and provide custom
 editing operations for different data structures.
 
+## Demos
+
+[Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)
+
+<center>
+[![Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/0.jpg)](https://youtu.be/GUX3DQjVg4c)
+</center>
+
 ## Inspiration
 
 My first inspiration for this projects is
