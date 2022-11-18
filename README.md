@@ -18,6 +18,10 @@ editing operations for different data structures.
 
 [![Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/maxresdefault.jpg)](https://youtu.be/GUX3DQjVg4c "Demo of new project that explores projectional, structured editing.")
 
+[My projectional editor can do this now?!](https://youtu.be/qa_2Bk4bLyw)
+
+[![My projectional editor can do this now?!](https://img.youtube.com/vi/qa_2Bk4bLyw/maxresdefault.jpg)](https://youtu.be/qa_2Bk4bLyw "My projectional editor can do this now?!")
+
 ## Inspiration
 
 My first inspiration for this projects is
