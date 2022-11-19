@@ -40,25 +40,21 @@ if __name__ == "__main__":
         import doctest
         import unittest
         import importlib
+        import os
+        def find_modules():
+            yield "rlproject"
+            for root, dirs, files in os.walk("rlprojectlib"):
+                dirs.remove("__pycache__")
+                if "__init__.py" in files:
+                    files.remove("__init__.py")
+                    yield root.replace("/", ".")
+                    for file in files:
+                        if file.endswith(".py"):
+                            yield os.path.join(root, file).replace("/", ".")[:-3]
+                else:
+                    dirs.clear()
         suite = unittest.TestSuite()
-        for module in [
-            "rlproject",
-            "rlprojectlib",
-            "rlprojectlib.domains",
-            "rlprojectlib.domains.generic",
-            "rlprojectlib.domains.lines",
-            "rlprojectlib.domains.string",
-            "rlprojectlib.domains.terminaltext",
-            "rlprojectlib.drivers",
-            "rlprojectlib.drivers.wxterminaltext",
-            "rlprojectlib.projections",
-            "rlprojectlib.projections.clipscroll",
-            "rlprojectlib.projections.editor",
-            "rlprojectlib.projections.lines_to_terminal_text",
-            "rlprojectlib.projections.split",
-            "rlprojectlib.projections.string_to_lines",
-            "rlprojectlib.projections.string_to_terminal_text",
-        ]:
+        for module in find_modules():
             suite.addTest(doctest.DocTestSuite(
                 importlib.import_module(module),
                 optionflags=doctest.REPORT_NDIFF|doctest.FAIL_FAST
