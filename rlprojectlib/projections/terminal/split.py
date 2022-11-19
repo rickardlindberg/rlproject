@@ -1,11 +1,10 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import SuperTuple
+from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
-from rlprojectlib.domains.terminal import Projection
 
 class Split(
     namedtuple("Split", "projection terminals width split_height"),
@@ -16,12 +15,12 @@ class Split(
     def project(terminals, width=0, split_height=0):
         """
         >>> Split.project([
-        ...     Terminal(fragments=SuperTuple([
+        ...     Terminal.create(fragments=[
         ...         TextFragment(0, 0, "one")
-        ...     ]), cursors=SuperTuple([])),
-        ...     Terminal(fragments=SuperTuple([
+        ...     ]),
+        ...     Terminal.create(fragments=[
         ...         TextFragment(0, 0, "two")
-        ...     ]), cursors=SuperTuple([])),
+        ...     ]),
         ... ], width=10, split_height=1).projection.print_fragments_and_cursors()
         TextFragment(x=0, y=0, text='one', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=1, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
@@ -39,9 +38,9 @@ class Split(
             cursors.extend(terminal.cursors.map(lambda x: x.move(dy=dy)))
             dy += split_height
         return Split(
-            projection=Terminal(
+            projection=Terminal.create(
                 fragments=builder.to_immutable(),
-                cursors=SuperTuple(cursors)
+                cursors=cursors
             ),
             terminals=terminals,
             width=width,

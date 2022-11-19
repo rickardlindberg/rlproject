@@ -1,12 +1,13 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import Selections, SuperTuple
-from rlprojectlib.domains.string import String, Selection
+from rlprojectlib.domains.generic import Selections
+from rlprojectlib.domains.string import Selection
+from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
+from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
-from rlprojectlib.domains.terminal import Projection
 
 class StringToTerminal(
     namedtuple("StringToTerminal", "projection string"),
@@ -54,7 +55,10 @@ class StringToTerminal(
             x=x
         ).replace_newlines(fg="MAGENTA"))
         return StringToTerminal(
-            projection=Terminal(fragments=fragments.to_immutable(), cursors=SuperTuple(cursors)),
+            projection=Terminal.create(
+                fragments=fragments.to_immutable(),
+                cursors=cursors
+            ),
             string=string
         )
 

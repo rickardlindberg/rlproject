@@ -2,7 +2,6 @@ from collections import namedtuple
 
 import time
 
-from rlprojectlib.domains.generic import SuperTuple
 from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
@@ -19,9 +18,9 @@ class Editor(
         """
         I project a status bar followed by the given terminal text:
 
-        >>> Editor.project(Terminal(
-        ...     fragments=SuperTuple([TextFragment(0, 0, "hello")]),
-        ...     cursors=SuperTuple([Cursor(0, 0)])
+        >>> Editor.project(Terminal.create(
+        ...     fragments=[TextFragment(0, 0, "hello")],
+        ...     cursors=[Cursor(0, 0)]
         ... )).print_fragments_and_cursors()
         TextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')

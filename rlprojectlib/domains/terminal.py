@@ -1,10 +1,18 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import Coordinate, SuperTuple
+from rlprojectlib.domains.generic import Coordinate
+from rlprojectlib.domains.generic import SuperTuple
 
 class Terminal(
     namedtuple("Terminal", "fragments cursors"),
 ):
+
+    @staticmethod
+    def create(fragments=[], cursors=[]):
+        return Terminal(
+            fragments=SuperTuple(fragments),
+            cursors=SuperTuple(cursors)
+        )
 
     def print_fragments_and_cursors(self):
         self.fragments.print()

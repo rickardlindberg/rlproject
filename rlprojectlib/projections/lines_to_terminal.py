@@ -1,12 +1,15 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import Selections, SuperTuple
-from rlprojectlib.domains.lines import Lines, Line, Selection, Position
+from rlprojectlib.domains.generic import Selections
+from rlprojectlib.domains.lines import Line
+from rlprojectlib.domains.lines import Lines
+from rlprojectlib.domains.lines import Position
+from rlprojectlib.domains.lines import Selection
 from rlprojectlib.domains.string import Selection as StringSelection
 from rlprojectlib.domains.string import String
+from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
-from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 
 class LinesToTerminalText(
@@ -53,7 +56,10 @@ class LinesToTerminalText(
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
         return LinesToTerminalText(
-            projection=Terminal(fragments=SuperTuple(fragments), cursors=SuperTuple(cursors)),
+            projection=Terminal.create(
+                fragments=fragments,
+                cursors=cursors
+            ),
             lines=lines,
         )
 

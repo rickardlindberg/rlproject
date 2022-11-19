@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import SuperTuple
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
@@ -16,9 +15,9 @@ class ClipScroll(
     def project(terminal, width=0, height=0):
         """
         >>> ClipScroll.project(
-        ...     terminal=Terminal(
-        ...         fragments=SuperTuple([TextFragment(0, 0, "hello")]),
-        ...         cursors=SuperTuple([Cursor(5, 0)]),
+        ...     terminal=Terminal.create(
+        ...         fragments=[TextFragment(0, 0, "hello")],
+        ...         cursors=[Cursor(5, 0)],
         ...     ),
         ...     width=2,
         ...     height=1,
