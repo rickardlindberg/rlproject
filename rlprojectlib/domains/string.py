@@ -18,18 +18,6 @@ class String(
             selections=Selections([Selection(selection_start, selection_length)])
         )
 
-    def keyboard_event(self, event):
-        if event.unicode_character == "\x06": # Ctrl-F
-            return self.move_cursor_forward()
-        elif event.unicode_character == "\x02": # Ctrl-B
-            return self.move_cursor_back()
-        elif event.unicode_character == "\x0e": # Ctrl-N
-            return self.select_next_word()
-        elif event.unicode_character and ord(event.unicode_character) >= 32:
-            return self.replace(event.unicode_character)
-        else:
-            return self
-
     def replace(self, text):
         """
         >>> String.from_string("hello", selection_length=1).replace("1").string

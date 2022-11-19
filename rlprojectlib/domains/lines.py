@@ -18,6 +18,18 @@ class Lines(
         self.lines.print()
         self.selections.print()
 
+    def move_cursor_forward(self):
+        return NotImplementedError()
+
+    def move_cursor_back(self):
+        return NotImplementedError()
+
+    def select_next_word(self):
+        return NotImplementedError()
+
+    def replace(self, text):
+        return NotImplementedError()
+
 class Projection:
 
     @property

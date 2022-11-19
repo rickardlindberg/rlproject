@@ -135,8 +135,3 @@ https://research.swtch.com/acme.pdf
 * Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
 
 ## TODO
-
-* Where to convert keystrokes to actions?
-    * String should not handle key_event
-        * Project key_event -> string operations
-        * Project key_event -> lines operations

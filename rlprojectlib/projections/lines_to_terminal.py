@@ -70,7 +70,17 @@ class LinesToTerminalText(
         ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
-        return LinesToTerminalText.project(self.lines.keyboard_event(event))
+        if event.unicode_character == "\x06": # Ctrl-F
+            lines = self.lines.move_cursor_forward()
+        elif event.unicode_character == "\x02": # Ctrl-B
+            lines = self.lines.move_cursor_back()
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            lines = self.lines.select_next_word()
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
+            lines = self.lines.replace(event.unicode_character)
+        else:
+            lines = self.lines
+        return LinesToTerminalText.project(lines)
 
     def size_event(self, event):
         return self

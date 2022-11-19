@@ -74,9 +74,17 @@ class StringToTerminal(
         ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
-        return StringToTerminal.project(
-            self.string.keyboard_event(event)
-        )
+        if event.unicode_character == "\x06": # Ctrl-F
+            string = self.string.move_cursor_forward()
+        elif event.unicode_character == "\x02": # Ctrl-B
+            string = self.string.move_cursor_back()
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            string = self.string.select_next_word()
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
+            string = self.string.replace(event.unicode_character)
+        else:
+            string = self.string
+        return StringToTerminal.project(string)
 
     def size_event(self, event):
         return self

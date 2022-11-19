@@ -70,5 +70,14 @@ class StringToLines(
             String.from_string(string=string, selection_start=start)
         ).print_lines_selections()
 
-    def keyboard_event(self, event):
-        return StringToLines.project(self.string.keyboard_event(event))
+    def move_cursor_forward(self):
+        return StringToLines.project(self.string.move_cursor_forward())
+
+    def move_cursor_back(self):
+        return StringToLines.project(self.string.move_cursor_back())
+
+    def select_next_word(self):
+        return StringToLines.project(self.string.select_next_word())
+
+    def replace(self, text):
+        return StringToLines.project(self.string.replace(text))
