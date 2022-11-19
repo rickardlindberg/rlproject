@@ -130,6 +130,15 @@ https://research.swtch.com/acme.pdf
         * Show only lines matching filters
     * Cursor and edit operations should only work on filtered lines
 
+* Operation 3: search and replace across files
+    * Enter search term to create a tree result looking like this:
+        ./foo.py
+            this foo is cool
+        ./foo/sub.py
+            a sub foo is also cool
+    * Select 'foo'
+    * Type 'b', 'a', 'r'
+
 * Word wrap projection
 
 * Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
