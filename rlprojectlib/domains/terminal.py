@@ -1,7 +1,7 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.generic import Coordinate
-from rlprojectlib.domains.generic import SuperTuple
+from rlprojectlib.domains.generic import ImmutableList
 
 class Terminal(
     namedtuple("Terminal", "fragments cursors"),
@@ -10,8 +10,8 @@ class Terminal(
     @staticmethod
     def create(fragments=[], cursors=[]):
         return Terminal(
-            fragments=SuperTuple(fragments),
-            cursors=SuperTuple(cursors)
+            fragments=ImmutableList(fragments),
+            cursors=ImmutableList(cursors)
         )
 
     def print_fragments_and_cursors(self):
@@ -33,9 +33,9 @@ class Terminal(
         for cursor in self.cursors:
             if cursor.x <= width and cursor.y < height:
                 cursors.append(cursor)
-        return Terminal(
-            fragments=fragments.to_immutable(),
-            cursors=SuperTuple(cursors)
+        return Terminal.create(
+            fragments=fragments.get(),
+            cursors=cursors
         )
 
     def add_fragment(self, fragment):
@@ -118,7 +118,7 @@ class TextFragment(
             if index > 0:
                 next_x += fragments.add(self._replace(x=next_x, **styling_kwargs))
             next_x += fragments.add(self._replace(x=next_x, text=subtext))
-        return fragments.to_immutable()
+        return fragments.get()
 
 class TextFragmentsBuilder:
 
@@ -133,8 +133,8 @@ class TextFragmentsBuilder:
     def extend(self, fragments):
         return sum(self.add(x) for x in fragments)
 
-    def to_immutable(self):
-        return SuperTuple(self.fragments)
+    def get(self):
+        return ImmutableList(self.fragments)
 
 class KeyboardEvent(
     namedtuple("KeyboardEvent", "unicode_character")

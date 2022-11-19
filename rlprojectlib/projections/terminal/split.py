@@ -39,7 +39,7 @@ class Split(
             dy += split_height
         return Split(
             projection=Terminal.create(
-                fragments=builder.to_immutable(),
+                fragments=builder.get(),
                 cursors=cursors
             ),
             terminals=terminals,

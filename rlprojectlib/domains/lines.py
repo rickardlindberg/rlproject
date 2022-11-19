@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import SuperTuple, Selections
+from rlprojectlib.domains.generic import ImmutableList, Selections
 from rlprojectlib.domains.string import Selection as StringSelection
 
 class Lines(
@@ -10,7 +10,7 @@ class Lines(
     @staticmethod
     def create(lines, selections):
         return Lines(
-            lines=SuperTuple(lines),
+            lines=ImmutableList(lines),
             selections=Selections(selections)
         )
 

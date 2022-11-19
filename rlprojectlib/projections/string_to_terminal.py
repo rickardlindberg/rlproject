@@ -56,7 +56,7 @@ class StringToTerminal(
         ).replace_newlines(fg="MAGENTA"))
         return StringToTerminal(
             projection=Terminal.create(
-                fragments=fragments.to_immutable(),
+                fragments=fragments.get(),
                 cursors=cursors
             ),
             string=string
