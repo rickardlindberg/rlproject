@@ -4,19 +4,19 @@ def example_document(path="rlproject.py"):
     """
     I can create an example document without crashing:
 
-    >>> from rlprojectlib.domains.terminaltext import SizeEvent
-    >>> from rlprojectlib.domains.terminaltext import KeyboardEvent
-    >>> terminal_text = example_document()
-    >>> _ = terminal_text.size_event(SizeEvent(10, 10))
-    >>> _ = terminal_text.keyboard_event(KeyboardEvent('a'))
+    >>> from rlprojectlib.domains.terminal import SizeEvent
+    >>> from rlprojectlib.domains.terminal import KeyboardEvent
+    >>> terminal = example_document()
+    >>> _ = terminal.size_event(SizeEvent(10, 10))
+    >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
     """
     from rlprojectlib.domains.string import String
     from rlprojectlib.projections.clipscroll import ClipScroll
     from rlprojectlib.projections.editor import Editor
-    from rlprojectlib.projections.lines_to_terminal_text import LinesToTerminalText
+    from rlprojectlib.projections.lines_to_terminal import LinesToTerminalText
     from rlprojectlib.projections.split import Split
     from rlprojectlib.projections.string_to_lines import StringToLines
-    from rlprojectlib.projections.string_to_terminal_text import StringToTerminalText
+    from rlprojectlib.projections.string_to_terminal import StringToTerminal
     return Editor.project(
         Split.project([
             ClipScroll.project(
@@ -27,7 +27,7 @@ def example_document(path="rlproject.py"):
                 ),
             ),
             ClipScroll.project(
-                StringToTerminalText.project(
+                StringToTerminal.project(
                     String.from_file(path)
                 ),
             ),
@@ -63,5 +63,5 @@ if __name__ == "__main__":
         if not result.wasSuccessful():
             sys.exit(1)
     else:
-        from rlprojectlib.drivers.wxterminaltext import WxTerminalTextDriver
-        WxTerminalTextDriver.run(example_document())
+        from rlprojectlib.drivers.wxterminal import WxTerminalDriver
+        WxTerminalDriver.run(example_document())

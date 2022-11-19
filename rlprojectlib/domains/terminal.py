@@ -2,8 +2,8 @@ from collections import namedtuple
 
 from rlprojectlib.domains.generic import Coordinate, SuperTuple
 
-class TerminalText(
-    namedtuple("TerminalText", "fragments cursors"),
+class Terminal(
+    namedtuple("Terminal", "fragments cursors"),
 ):
 
     def print_fragments_and_cursors(self):
@@ -17,7 +17,7 @@ class TerminalText(
         )
 
     def clip(self, width, height):
-        fragments = TerminalTextFragmentsBuilder()
+        fragments = TextFragmentsBuilder()
         for fragment in self.fragments:
             if fragment.y < height:
                 fragments.add(fragment.clip(width))
@@ -25,7 +25,7 @@ class TerminalText(
         for cursor in self.cursors:
             if cursor.x <= width and cursor.y < height:
                 cursors.append(cursor)
-        return TerminalText(
+        return Terminal(
             fragments=fragments.to_immutable(),
             cursors=SuperTuple(cursors)
         )
@@ -35,7 +35,7 @@ class TerminalText(
             fragments=self.fragments.add(fragment)
         )
 
-class TerminalTextProjection:
+class Projection:
 
     @property
     def fragments(self):
@@ -54,15 +54,15 @@ class TerminalTextProjection:
     def clip(self, *args, **kwargs):
         return self.projection.clip(*args, **kwargs)
 
-class TerminalCursor(
-    namedtuple("TerminalCursor", "x y"),
+class Cursor(
+    namedtuple("Cursor", "x y"),
     Coordinate
 ):
     pass
 
-class TerminalTextFragment(
+class TextFragment(
     namedtuple(
-        "TerminalTextFragment",
+        "TextFragment",
         "x y text bold bg fg",
         defaults=[None, None, None]
     ),
@@ -71,14 +71,14 @@ class TerminalTextFragment(
 
     def clip(self, width):
         """
-        >>> TerminalTextFragment(0, 0, "hello").clip(2)
-        TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
+        >>> TextFragment(0, 0, "hello").clip(2)
+        TextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
 
-        >>> TerminalTextFragment(-2, 0, "hello").clip(2)
-        TerminalTextFragment(x=0, y=0, text='ll', bold=None, bg=None, fg=None)
+        >>> TextFragment(-2, 0, "hello").clip(2)
+        TextFragment(x=0, y=0, text='ll', bold=None, bg=None, fg=None)
 
-        >>> TerminalTextFragment(1, 0, "hello").clip(2)
-        TerminalTextFragment(x=1, y=0, text='h', bold=None, bg=None, fg=None)
+        >>> TextFragment(1, 0, "hello").clip(2)
+        TextFragment(x=1, y=0, text='h', bold=None, bg=None, fg=None)
         """
         if self.x < 0:
             start = -self.x
@@ -95,16 +95,16 @@ class TerminalTextFragment(
 
     def split(self, separator, **styling_kwargs):
         """
-        >>> TerminalTextFragment(0, 0, "hello").split("ll", text="||", fg="YELLOW").print()
-        TerminalTextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
-        TerminalTextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
+        >>> TextFragment(0, 0, "hello").split("ll", text="||", fg="YELLOW").print()
+        TextFragment(x=0, y=0, text='he', bold=None, bg=None, fg=None)
+        TextFragment(x=2, y=0, text='||', bold=None, bg=None, fg='YELLOW')
+        TextFragment(x=4, y=0, text='o', bold=None, bg=None, fg=None)
 
-        >>> TerminalTextFragment(0, 0, "n2").split("n", text="N").print()
-        TerminalTextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
-        TerminalTextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
+        >>> TextFragment(0, 0, "n2").split("n", text="N").print()
+        TextFragment(x=0, y=0, text='N', bold=None, bg=None, fg=None)
+        TextFragment(x=1, y=0, text='2', bold=None, bg=None, fg=None)
         """
-        fragments = TerminalTextFragmentsBuilder()
+        fragments = TextFragmentsBuilder()
         next_x = self.x
         for index, subtext in enumerate(self.text.split(separator)):
             if index > 0:
@@ -112,7 +112,7 @@ class TerminalTextFragment(
             next_x += fragments.add(self._replace(x=next_x, text=subtext))
         return fragments.to_immutable()
 
-class TerminalTextFragmentsBuilder:
+class TextFragmentsBuilder:
 
     def __init__(self):
         self.fragments = []

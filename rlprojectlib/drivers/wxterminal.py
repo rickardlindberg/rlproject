@@ -1,14 +1,15 @@
 import wx
 
-from rlprojectlib.domains.terminaltext import KeyboardEvent, SizeEvent
+from rlprojectlib.domains.terminal import KeyboardEvent
+from rlprojectlib.domains.terminal import SizeEvent
 
-class WxTerminalTextDriver(wx.Panel):
+class WxTerminalDriver(wx.Panel):
 
     @staticmethod
-    def run(terminal_text):
+    def run(terminal):
         app = wx.App()
         main_frame = wx.Frame(None)
-        WxTerminalTextDriver(main_frame, terminal_text)
+        WxTerminalDriver(main_frame, terminal)
         main_frame.Show()
         app.MainLoop()
 
@@ -28,9 +29,9 @@ class WxTerminalTextDriver(wx.Panel):
         },
     }
 
-    def __init__(self, parent, terminal_text):
+    def __init__(self, parent, terminal):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.terminal_text = terminal_text
+        self.terminal = terminal
         self.cursor_blink_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
@@ -43,14 +44,14 @@ class WxTerminalTextDriver(wx.Panel):
 
     def on_size(self, evt):
         width, height = self.repaint_bitmap()
-        self.terminal_text = self.terminal_text.size_event(SizeEvent(
+        self.terminal = self.terminal.size_event(SizeEvent(
             width=width,
             height=height
         ))
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        self.terminal_text = self.terminal_text.keyboard_event(KeyboardEvent(
+        self.terminal = self.terminal.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
         self.repaint_bitmap()
@@ -94,17 +95,17 @@ class WxTerminalTextDriver(wx.Panel):
         memdc.Clear()
         memdc.SetFont(font)
         char_width, char_height = memdc.GetTextExtent(".")
-        for string in self.terminal_text.fragments:
-            if string.bold:
+        for fragment in self.terminal.fragments:
+            if fragment.bold:
                 memdc.SetFont(font_bold)
             else:
                 memdc.SetFont(font)
-            memdc.SetTextBackground(self.THEME["colors"].get(string.bg, self.THEME["colors"]["BACKGROUND"]))
-            memdc.SetTextForeground(self.THEME["colors"].get(string.fg, self.THEME["colors"]["FOREGROUND"]))
-            memdc.DrawText(string.text, string.x*char_width, string.y*char_height)
+            memdc.SetTextBackground(self.THEME["colors"].get(fragment.bg, self.THEME["colors"]["BACKGROUND"]))
+            memdc.SetTextForeground(self.THEME["colors"].get(fragment.fg, self.THEME["colors"]["FOREGROUND"]))
+            memdc.DrawText(fragment.text, fragment.x*char_width, fragment.y*char_height)
         del memdc
         self.cursor_rects = []
-        for cursor in self.terminal_text.cursors:
+        for cursor in self.terminal.cursors:
             self.cursor_rects.append(wx.Rect(
                 cursor.x*char_width-1,
                 cursor.y*char_height,
