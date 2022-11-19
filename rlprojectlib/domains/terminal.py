@@ -25,17 +25,14 @@ class Terminal(
         )
 
     def clip(self, width, height):
-        fragments = TextFragmentsBuilder()
-        for fragment in self.fragments:
-            if fragment.y < height:
-                fragments.add(fragment.clip(width))
-        cursors = []
-        for cursor in self.cursors:
-            if cursor.x <= width and cursor.y < height:
-                cursors.append(cursor)
-        return Terminal.create(
-            fragments=fragments.get(),
-            cursors=cursors
+        return Terminal(
+            fragments=self.fragments.filter(lambda fragment:
+                fragment.y < height
+            ).map(lambda fragment: fragment.clip(width)),
+            cursors=self.cursors.filter(lambda cursor:
+                cursor.x >= 0 and cursor.x < width and
+                cursor.y >= 0 and cursor.y < height
+            )
         )
 
     def add_fragment(self, fragment):

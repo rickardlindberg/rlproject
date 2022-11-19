@@ -9,7 +9,10 @@ class ImmutableList(tuple):
         return ImmutableList(self+(item,))
 
     def map(self, fn):
-        return ImmutableList([fn(x) for x in self])
+        return ImmutableList(fn(x) for x in self)
+
+    def filter(self, fn):
+        return ImmutableList(x for x in self if fn(x))
 
     def print(self):
         for item in self:
