@@ -109,6 +109,10 @@ https://research.swtch.com/acme.pdf
   layout constraints and algorithms. Boxes are cached. Id of immutable parsed
   structure.
 
+* Will a rope data structure be useful for better caching/performance?
+
+    * [TCR test && commit || revert -- Rope in Python 1/3](https://youtu.be/Aof0F9DvTFg)
+
 ## Use cases
 
 * Editing structured file
