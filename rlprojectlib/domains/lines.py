@@ -18,7 +18,7 @@ class Lines(
         self.lines.print()
         self.selections.print()
 
-class LinesProjection:
+class Projection:
 
     @property
     def lines(self):
