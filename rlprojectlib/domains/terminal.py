@@ -141,4 +141,8 @@ class KeyboardEvent(
 class SizeEvent(
     namedtuple("SizeEvent", "width height")
 ):
-    pass
+
+    def resize(self, height=None, dh=0):
+        return self._replace(
+            height=(self.height if height is None else height)+dh
+        )

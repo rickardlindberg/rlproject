@@ -2,7 +2,6 @@ from collections import namedtuple
 
 import time
 
-from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
@@ -53,10 +52,7 @@ class Editor(
 
     def size_event(self, event):
         terminal, ms = measure_ms(lambda:
-            self.terminal.size_event(SizeEvent(
-                width=event.width,
-                height=event.height-1
-            ))
+            self.terminal.size_event(event.resize(dh=-1))
         )
         return Editor.project(
             terminal=terminal,

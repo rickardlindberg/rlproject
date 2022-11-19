@@ -1,7 +1,6 @@
 from collections import namedtuple
 
 from rlprojectlib.domains.terminal import Projection
-from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
@@ -62,8 +61,7 @@ class Split(
         )
         sized_terminal_texts = []
         for terminal in self.terminals:
-            sized_terminal_texts.append(terminal.size_event(SizeEvent(
-                width=event.width,
+            sized_terminal_texts.append(terminal.size_event(event.resize(
                 height=split_height
             )))
         return Split.project(
