@@ -11,12 +11,12 @@ def example_document(path="rlproject.py"):
     >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
     """
     from rlprojectlib.domains.string import String
-    from rlprojectlib.projections.clipscroll import ClipScroll
-    from rlprojectlib.projections.editor import Editor
     from rlprojectlib.projections.lines_to_terminal import LinesToTerminalText
-    from rlprojectlib.projections.split import Split
     from rlprojectlib.projections.string_to_lines import StringToLines
     from rlprojectlib.projections.string_to_terminal import StringToTerminal
+    from rlprojectlib.projections.terminal.clipscroll import ClipScroll
+    from rlprojectlib.projections.terminal.editor import Editor
+    from rlprojectlib.projections.terminal.split import Split
     return Editor.project(
         Split.project([
             ClipScroll.project(
@@ -44,7 +44,8 @@ if __name__ == "__main__":
         def find_modules():
             yield "rlproject"
             for root, dirs, files in os.walk("rlprojectlib"):
-                dirs.remove("__pycache__")
+                if "__pycache__" in dirs:
+                    dirs.remove("__pycache__")
                 if "__init__.py" in files:
                     files.remove("__init__.py")
                     yield root.replace("/", ".")
