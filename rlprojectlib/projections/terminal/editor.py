@@ -2,10 +2,12 @@ from collections import namedtuple
 
 import time
 
+from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
+from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
-from rlprojectlib.domains.terminal import Projection
+from rlprojectlib.projections.string_to_terminal import StringToTerminal
 
 class Editor(
     namedtuple("Editor", "projection terminal width popup"),
@@ -39,13 +41,13 @@ class Editor(
             ).add_fragment(
                 status_fragment
             ).add_fragment(TextFragment(
-                text=f"Filter: ".ljust(width),
+                text=f"Filter:".ljust(width),
                 x=0,
                 y=1,
                 bg="GREEN",
                 fg="WHITE",
                 bold=True
-            ))
+            )).merge(popup.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
         else:
             projection = terminal.translate(
                 dy=1
@@ -71,7 +73,7 @@ class Editor(
                     self.popup.keyboard_event(event)
                 )
         elif event.unicode_character == "\x07":
-            popup = Terminal.create()
+            popup = StringToTerminal.project(String.from_string(""))
         else:
             terminal, ms = measure_ms(lambda:
                 self.terminal.keyboard_event(event)

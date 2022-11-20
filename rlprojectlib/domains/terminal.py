@@ -43,6 +43,15 @@ class Terminal(
     def clear_cursors(self):
         return self._replace(cursors=ImmutableList())
 
+    def merge(self, terminal):
+        return Terminal(
+            fragments=self.fragments.merge(terminal.fragments),
+            cursors=self.cursors.merge(terminal.cursors),
+        )
+
+    def style(self, **kwargs):
+        return self._replace(fragments=self.fragments.map(lambda x: x._replace(**kwargs)))
+
 class Projection:
 
     @property
@@ -64,6 +73,9 @@ class Projection:
 
     def clear_cursors(self, *args, **kwargs):
         return self.projection.clear_cursors(*args, **kwargs)
+
+    def style(self, *args, **kwargs):
+        return self.projection.style(*args, **kwargs)
 
 class Cursor(
     namedtuple("Cursor", "x y"),
