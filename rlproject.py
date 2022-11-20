@@ -30,6 +30,10 @@ if __name__ == "__main__":
         if not result.wasSuccessful():
             sys.exit(1)
     else:
+        if sys.argv[1:]:
+            path = sys.argv[1]
+        else:
+            path = "rlproject.py"
         from rlprojectlib.drivers.wxterminal import WxTerminalDriver
         from rlprojectlib.projections.terminal.editor import Editor
-        WxTerminalDriver.run(Editor.from_file("rlproject.py"))
+        WxTerminalDriver.run(Editor.from_file(path))
