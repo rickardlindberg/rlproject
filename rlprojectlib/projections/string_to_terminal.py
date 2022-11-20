@@ -80,6 +80,8 @@ class StringToTerminal(
             string = self.string.move_cursor_back()
         elif event.unicode_character == "\x0e": # Ctrl-N
             string = self.string.select_next_word()
+        elif event.unicode_character == "\x08": # Backspace
+            string = self.string.delete_back()
         elif event.unicode_character and ord(event.unicode_character) >= 32:
             string = self.string.replace(event.unicode_character)
         else:

@@ -64,6 +64,15 @@ class String(
                 length=-5
             )]))
 
+    def delete_back(self):
+        """
+        >>> String.from_string("hello", 1).delete_back()
+        String(string='ello', selections=Selections(Selection(start=0, length=0)))
+        """
+        return self._replace(selections=self.selections.map(lambda x:
+            x.delete_back()
+        )).replace("")
+
 class Selection(
     namedtuple("Selection", "start length")
 ):
@@ -94,3 +103,9 @@ class Selection(
 
     def move_forward(self, steps=1):
         return self._replace(start=self.start+steps)
+
+    def delete_back(self):
+        if self.start <= 0:
+            return self
+        else:
+            return self._replace(start=self.start-1, length=1)

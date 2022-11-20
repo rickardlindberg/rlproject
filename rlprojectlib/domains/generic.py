@@ -6,13 +6,16 @@ class Coordinate:
 class ImmutableList(tuple):
 
     def add(self, item):
-        return ImmutableList(self+(item,))
+        return self.merge((item,))
+
+    def merge(self, items):
+        return self.__class__(self+items)
 
     def map(self, fn):
-        return ImmutableList(fn(x) for x in self)
+        return self.__class__(fn(x) for x in self)
 
     def filter(self, fn):
-        return ImmutableList(x for x in self if fn(x))
+        return self.__class__(x for x in self if fn(x))
 
     def print(self):
         for item in self:
