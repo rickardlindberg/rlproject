@@ -63,8 +63,6 @@ class Editor(
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=0, y=1)
         """
-
-
         status_fragment = TextFragment(
             text=f"{event} {ms}ms".ljust(width),
             x=0,
