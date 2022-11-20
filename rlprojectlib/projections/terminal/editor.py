@@ -26,7 +26,7 @@ class Editor(
         Cursor(x=0, y=1)
         """
         if popup:
-            projection = terminal.translate(dy=2).add_fragment(TextFragment(
+            projection = terminal.clear_cursors().translate(dy=2).add_fragment(TextFragment(
                 text=f"{event} {ms}ms".ljust(width),
                 x=0,
                 y=0,

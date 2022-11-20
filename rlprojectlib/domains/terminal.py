@@ -40,6 +40,9 @@ class Terminal(
             fragments=self.fragments.add(fragment)
         )
 
+    def clear_cursors(self):
+        return self._replace(cursors=ImmutableList())
+
 class Projection:
 
     @property
@@ -58,6 +61,9 @@ class Projection:
 
     def clip(self, *args, **kwargs):
         return self.projection.clip(*args, **kwargs)
+
+    def clear_cursors(self, *args, **kwargs):
+        return self.projection.clear_cursors(*args, **kwargs)
 
 class Cursor(
     namedtuple("Cursor", "x y"),
