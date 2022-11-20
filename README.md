@@ -113,6 +113,11 @@ https://research.swtch.com/acme.pdf
 
     * [TCR test && commit || revert -- Rope in Python 1/3](https://youtu.be/Aof0F9DvTFg)
 
+* Documents can have a `meta` field instead of projections having to emulate
+  being a document?
+
+    * document.meta.source could be followed for the IO map
+
 ## Use cases
 
 * Editing structured file
@@ -148,3 +153,5 @@ https://research.swtch.com/acme.pdf
 * Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
 
 ## TODO
+
+* LinesToTerminalText -> LinesToTerminal
