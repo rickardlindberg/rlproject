@@ -1,39 +1,5 @@
 #!/usr/bin/env python3
 
-def example_document(path="rlproject.py"):
-    """
-    I can create an example document without crashing:
-
-    >>> from rlprojectlib.domains.terminal import SizeEvent
-    >>> from rlprojectlib.domains.terminal import KeyboardEvent
-    >>> terminal = example_document()
-    >>> _ = terminal.size_event(SizeEvent(10, 10))
-    >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
-    """
-    from rlprojectlib.domains.string import String
-    from rlprojectlib.projections.lines_to_terminal import LinesToTerminalText
-    from rlprojectlib.projections.string_to_lines import StringToLines
-    from rlprojectlib.projections.string_to_terminal import StringToTerminal
-    from rlprojectlib.projections.terminal.clipscroll import ClipScroll
-    from rlprojectlib.projections.terminal.editor import Editor
-    from rlprojectlib.projections.terminal.split import Split
-    return Editor.project(
-        Split.project([
-            ClipScroll.project(
-                LinesToTerminalText.project(
-                    StringToLines.project(
-                        String.from_file(path)
-                    )
-                ),
-            ),
-            ClipScroll.project(
-                StringToTerminal.project(
-                    String.from_file(path)
-                ),
-            ),
-        ])
-    )
-
 if __name__ == "__main__":
     import sys
     if "--test" in sys.argv[1:]:
@@ -65,4 +31,5 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         from rlprojectlib.drivers.wxterminal import WxTerminalDriver
-        WxTerminalDriver.run(example_document())
+        from rlprojectlib.projections.terminal.editor import Editor
+        WxTerminalDriver.run(Editor.from_file("rlproject.py"))

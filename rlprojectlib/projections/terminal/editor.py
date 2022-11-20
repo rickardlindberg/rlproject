@@ -14,6 +14,42 @@ class Editor(
     Projection
 ):
 
+    """
+    I can edit an example document without crashing:
+
+    >>> from rlprojectlib.domains.terminal import SizeEvent
+    >>> from rlprojectlib.domains.terminal import KeyboardEvent
+    >>> terminal = Editor.from_file("rlproject.py")
+    >>> _ = terminal.size_event(SizeEvent(10, 10))
+    >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
+    """
+
+    @staticmethod
+    def from_file(path):
+        from rlprojectlib.domains.string import String
+        from rlprojectlib.projections.lines_to_terminal import LinesToTerminalText
+        from rlprojectlib.projections.string_to_lines import StringToLines
+        from rlprojectlib.projections.string_to_terminal import StringToTerminal
+        from rlprojectlib.projections.terminal.clipscroll import ClipScroll
+        from rlprojectlib.projections.terminal.editor import Editor
+        from rlprojectlib.projections.terminal.split import Split
+        return Editor.project(
+            Split.project([
+                ClipScroll.project(
+                    LinesToTerminalText.project(
+                        StringToLines.project(
+                            String.from_file(path)
+                        )
+                    ),
+                ),
+                ClipScroll.project(
+                    StringToTerminal.project(
+                        String.from_file(path)
+                    ),
+                ),
+            ])
+        )
+
     @staticmethod
     def project(terminal, event=None, width=0, ms=0, popup=None):
         """
@@ -27,6 +63,8 @@ class Editor(
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=0, y=1)
         """
+
+
         status_fragment = TextFragment(
             text=f"{event} {ms}ms".ljust(width),
             x=0,
