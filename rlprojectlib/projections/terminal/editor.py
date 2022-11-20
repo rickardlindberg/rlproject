@@ -25,14 +25,20 @@ class Editor(
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=0, y=1)
         """
+        status_fragment = TextFragment(
+            text=f"{event} {ms}ms".ljust(width),
+            x=0,
+            y=0,
+            bg="MAGENTA",
+            fg="WHITE"
+        )
         if popup:
-            projection = terminal.clear_cursors().translate(dy=2).add_fragment(TextFragment(
-                text=f"{event} {ms}ms".ljust(width),
-                x=0,
-                y=0,
-                bg="MAGENTA",
-                fg="WHITE"
-            )).add_fragment(TextFragment(
+            projection = terminal.clear_cursors(
+            ).translate(
+                dy=2
+            ).add_fragment(
+                status_fragment
+            ).add_fragment(TextFragment(
                 text=f"Filter: ".ljust(width),
                 x=0,
                 y=1,
@@ -41,14 +47,10 @@ class Editor(
                 bold=True
             ))
         else:
-            projection = terminal.translate(dy=1).add_fragment(
-                TextFragment(
-                    text=f"{event} {ms}ms".ljust(width),
-                    x=0,
-                    y=0,
-                    bg="MAGENTA",
-                    fg="WHITE"
-                )
+            projection = terminal.translate(
+                dy=1
+            ).add_fragment(
+                status_fragment
             )
         return Editor(
             projection=projection,
