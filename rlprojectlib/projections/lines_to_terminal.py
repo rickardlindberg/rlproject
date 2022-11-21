@@ -12,15 +12,15 @@ from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 
-class LinesToTerminalText(
-    namedtuple("LinesToTerminalText", "projection lines"),
+class LinesToTerminal(
+    namedtuple("LinesToTerminal", "projection lines"),
     Projection
 ):
 
     @staticmethod
     def project(lines):
         """
-        >>> LinesToTerminalText.test_project([
+        >>> LinesToTerminal.test_project([
         ...     Line(text="one", number=1),
         ...     Line(text="two", number=2),
         ... ])
@@ -29,7 +29,7 @@ class LinesToTerminalText(
         TextFragment(x=0, y=1, text='2', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=1, text='two', bold=None, bg=None, fg=None)
 
-        >>> LinesToTerminalText.test_project([
+        >>> LinesToTerminal.test_project([
         ...     Line(text="one", number=1),
         ...     Line(text="two", number=2),
         ... ], [Selection(start=Position(row=0, col=0), end=Position(row=0, col=1))])
@@ -55,7 +55,7 @@ class LinesToTerminalText(
             fragments.append(TextFragment(x=0, y=index, text=str(line.number), fg="YELLOW"))
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
-        return LinesToTerminalText(
+        return LinesToTerminal(
             projection=Terminal.create(
                 fragments=fragments,
                 cursors=cursors
@@ -65,7 +65,7 @@ class LinesToTerminalText(
 
     @staticmethod
     def test_project(lines, selections=[]):
-        LinesToTerminalText.project(
+        LinesToTerminal.project(
             Lines.create(lines=lines, selections=selections)
         ).print_fragments_and_cursors()
 
@@ -80,7 +80,7 @@ class LinesToTerminalText(
             lines = self.lines.replace(event.unicode_character)
         else:
             lines = self.lines
-        return LinesToTerminalText.project(lines)
+        return LinesToTerminal.project(lines)
 
     def size_event(self, event):
         return self

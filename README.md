@@ -151,7 +151,3 @@ https://research.swtch.com/acme.pdf
 * Word wrap projection
 
 * Projectional editor to analyze RLMeta intermediate results. RLMeta IDE.
-
-## TODO
-
-* LinesToTerminalText -> LinesToTerminal

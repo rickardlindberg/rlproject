@@ -27,7 +27,7 @@ class Editor(
     @staticmethod
     def from_file(path):
         from rlprojectlib.domains.string import String
-        from rlprojectlib.projections.lines_to_terminal import LinesToTerminalText
+        from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
         from rlprojectlib.projections.string_to_lines import StringToLines
         from rlprojectlib.projections.string_to_terminal import StringToTerminal
         from rlprojectlib.projections.terminal.clipscroll import ClipScroll
@@ -36,7 +36,7 @@ class Editor(
         return Editor.project(
             Split.project([
                 ClipScroll.project(
-                    LinesToTerminalText.project(
+                    LinesToTerminal.project(
                         StringToLines.project(
                             String.from_file(path)
                         )
