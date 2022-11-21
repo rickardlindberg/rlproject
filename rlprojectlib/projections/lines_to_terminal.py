@@ -50,7 +50,7 @@ class LinesToTerminal(
                     selections_per_line[index] = []
                 selections_per_line[index].append(selection)
         for index, line in enumerate(lines.lines):
-            y = String(string=line.text, selections=Selections(selections_per_line.get(index, [])))
+            y = String(meta=None, string=line.text, selections=Selections(selections_per_line.get(index, [])))
             x = StringToTerminal.project(y, y=index, x=line_number_len+1)
             fragments.append(TextFragment(x=0, y=index, text=str(line.number), fg="YELLOW"))
             fragments.extend(x.fragments)

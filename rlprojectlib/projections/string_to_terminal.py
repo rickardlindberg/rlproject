@@ -66,8 +66,9 @@ class StringToTerminal(
     def test_project(string, selection_start=0, selection_length=0):
         StringToTerminal.project(
             String(
-                string,
-                Selections([
+                meta=None,
+                string=string,
+                selections=Selections([
                     Selection(start=selection_start, length=selection_length)
                 ])
             )

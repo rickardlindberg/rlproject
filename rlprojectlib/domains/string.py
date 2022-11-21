@@ -3,7 +3,7 @@ from collections import namedtuple
 from rlprojectlib.domains.generic import Selections
 
 class String(
-    namedtuple("String", "string selections")
+    namedtuple("String", "meta string selections")
 ):
 
     @staticmethod
@@ -14,6 +14,7 @@ class String(
     @staticmethod
     def from_string(string, selection_start=0, selection_length=0):
         return String(
+            meta=None,
             string=string,
             selections=Selections([Selection(selection_start, selection_length)])
         )
@@ -32,19 +33,19 @@ class String(
             parts.append(text)
             selections.append(Selection(start=len("".join(parts)), length=0))
         parts.append(self.string[last_pos:])
-        return String(
+        return self._replace(
             string="".join(parts),
             selections=Selections(selections)
         )
 
     def move_cursor_back(self):
-        return String(
+        return self._replace(
             string=self.string,
             selections=Selections([self.selections[-1].move_cursor_back()])
         )
 
     def move_cursor_forward(self):
-        return String(
+        return self._replace(
             string=self.string,
             selections=Selections([self.selections[-1].move_cursor_forward()])
         )
@@ -52,7 +53,7 @@ class String(
     def select_next_word(self):
         """
         >>> String.from_string("hello there").select_next_word()
-        String(string='hello there', selections=Selections(Selection(start=5, length=-5)))
+        String(meta=None, string='hello there', selections=Selections(Selection(start=5, length=-5)))
         """
         if abs(self.selections[-1].length) > 0:
             return self._replace(selections=Selections(
@@ -67,7 +68,7 @@ class String(
     def delete_back(self):
         """
         >>> String.from_string("hello", 1).delete_back()
-        String(string='ello', selections=Selections(Selection(start=0, length=0)))
+        String(meta=None, string='ello', selections=Selections(Selection(start=0, length=0)))
         """
         return self._replace(selections=self.selections.map(lambda x:
             x.delete_back()
