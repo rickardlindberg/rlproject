@@ -4,12 +4,13 @@ from rlprojectlib.domains.generic import ImmutableList, Selections
 from rlprojectlib.domains.string import Selection as StringSelection
 
 class Lines(
-    namedtuple("Lines", "lines selections")
+    namedtuple("Lines", "meta lines selections")
 ):
 
     @staticmethod
     def create(lines, selections):
         return Lines(
+            meta=None,
             lines=ImmutableList(lines),
             selections=Selections(selections)
         )
