@@ -3,7 +3,6 @@ from collections import namedtuple
 from rlprojectlib.domains.lines import Line
 from rlprojectlib.domains.lines import Lines
 from rlprojectlib.domains.lines import Position
-from rlprojectlib.domains.lines import Projection
 from rlprojectlib.domains.lines import Selection
 from rlprojectlib.domains.string import String
 

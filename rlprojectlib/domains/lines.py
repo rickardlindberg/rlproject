@@ -31,19 +31,6 @@ class Lines(
     def replace(self, text):
         return NotImplementedError()
 
-class Projection:
-
-    @property
-    def lines(self):
-        return self.projection.lines
-
-    @property
-    def selections(self):
-        return self.projection.selections
-
-    def print_lines_selections(self):
-        self.projection.print_lines_selections()
-
 class Line(
     namedtuple("Line", "text number")
 ):
