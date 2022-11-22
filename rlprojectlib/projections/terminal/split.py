@@ -1,6 +1,5 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder

@@ -4,7 +4,6 @@ from rlprojectlib.domains.generic import Selections
 from rlprojectlib.domains.string import Selection
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
-from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder

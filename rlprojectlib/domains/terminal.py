@@ -56,31 +56,6 @@ class Terminal(
     def style(self, **kwargs):
         return self._replace(fragments=self.fragments.map(lambda x: x._replace(**kwargs)))
 
-class Projection:
-
-    @property
-    def fragments(self):
-        return self.projection.fragments
-
-    @property
-    def cursors(self):
-        return self.projection.cursors
-
-    def print_fragments_and_cursors(self):
-        self.projection.print_fragments_and_cursors()
-
-    def translate(self, *args, **kwargs):
-        return self.projection.translate(*args, **kwargs)
-
-    def clip(self, *args, **kwargs):
-        return self.projection.clip(*args, **kwargs)
-
-    def clear_cursors(self, *args, **kwargs):
-        return self.projection.clear_cursors(*args, **kwargs)
-
-    def style(self, *args, **kwargs):
-        return self.projection.style(*args, **kwargs)
-
 class Cursor(
     namedtuple("Cursor", "x y"),
     Coordinate

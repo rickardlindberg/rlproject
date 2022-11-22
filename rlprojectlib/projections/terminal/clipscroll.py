@@ -4,7 +4,6 @@ from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
-from rlprojectlib.domains.terminal import Projection
 
 class Meta(
     namedtuple("Meta", "terminal width height")

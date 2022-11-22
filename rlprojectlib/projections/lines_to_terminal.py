@@ -7,7 +7,6 @@ from rlprojectlib.domains.lines import Position
 from rlprojectlib.domains.lines import Selection
 from rlprojectlib.domains.string import Selection as StringSelection
 from rlprojectlib.domains.string import String
-from rlprojectlib.domains.terminal import Projection
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
