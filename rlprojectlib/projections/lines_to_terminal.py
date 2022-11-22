@@ -56,13 +56,11 @@ class LinesToTerminal(Terminal):
             fragments.append(TextFragment(x=0, y=index, text=str(line.number), fg="YELLOW"))
             fragments.extend(x.fragments)
             cursors.extend(x.cursors)
-        return LinesToTerminal(
-            *Terminal.create(
-                fragments=fragments,
-                cursors=cursors,
-                meta=Meta(
-                    lines=lines
-                )
+        return LinesToTerminal.create(
+            fragments=fragments,
+            cursors=cursors,
+            meta=Meta(
+                lines=lines
             )
         )
 
