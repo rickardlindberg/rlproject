@@ -9,10 +9,12 @@ from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 
-class Editor(
-    namedtuple("Editor", "projection terminal width popup"),
-    Projection
+class Meta(
+    namedtuple("Meta", "terminal width popup")
 ):
+    pass
+
+class Editor(Terminal):
 
     """
     I can edit an example document without crashing:
@@ -91,51 +93,52 @@ class Editor(
                 status_fragment
             )
         return Editor(
-            projection=projection,
-            terminal=terminal,
-            width=width,
-            popup=popup
+            *projection.with_meta(Meta(
+                terminal=terminal,
+                width=width,
+                popup=popup
+            ))
         )
 
     def keyboard_event(self, event):
-        terminal = self.terminal
-        popup = self.popup
+        terminal = self.meta.terminal
+        popup = self.meta.popup
         ms = 0
-        if self.popup:
+        if self.meta.popup:
             if event.unicode_character == "\x07":
                 popup = None
             else:
                 popup, ms = measure_ms(lambda:
-                    self.popup.keyboard_event(event)
+                    self.meta.popup.keyboard_event(event)
                 )
         elif event.unicode_character == "\x07":
             popup = StringToTerminal.project(String.from_string(""))
         else:
             terminal, ms = measure_ms(lambda:
-                self.terminal.keyboard_event(event)
+                self.meta.terminal.keyboard_event(event)
             )
         return Editor.project(
             terminal=terminal,
             event=event,
-            width=self.width,
+            width=self.meta.width,
             ms=ms,
             popup=popup
         )
 
     def size_event(self, event):
-        if self.popup:
+        if self.meta.popup:
             popup_height = 1
         else:
             popup_height = 0
         terminal, ms = measure_ms(lambda:
-            self.terminal.size_event(event.resize(dh=-1-popup_height))
+            self.meta.terminal.size_event(event.resize(dh=-1-popup_height))
         )
         return Editor.project(
             terminal=terminal,
             event=event,
             width=event.width,
             ms=ms,
-            popup=self.popup
+            popup=self.meta.popup
         )
 
 def measure_ms(fn):
