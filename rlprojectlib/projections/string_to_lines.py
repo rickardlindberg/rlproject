@@ -1,5 +1,7 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.generic import ImmutableList
+from rlprojectlib.domains.generic import Selections
 from rlprojectlib.domains.lines import Line
 from rlprojectlib.domains.lines import Lines
 from rlprojectlib.domains.lines import Position
@@ -7,10 +9,12 @@ from rlprojectlib.domains.lines import Projection
 from rlprojectlib.domains.lines import Selection
 from rlprojectlib.domains.string import String
 
-class StringToLines(
-    namedtuple("StringToLines", "projection string"),
-    Projection
+class Meta(
+    namedtuple("Meta", "string")
 ):
+    pass
+
+class StringToLines(Lines):
 
     @staticmethod
     def project(string):
@@ -57,11 +61,9 @@ class StringToLines(
                     end = Position(row=row, col=selection.pos_end-x)
             selections.append(Selection(start=start, end=end))
         return StringToLines(
-            projection=Lines.create(
-                lines=(line[0] for line in lines),
-                selections=selections
-            ),
-            string=string,
+            lines=ImmutableList(line[0] for line in lines),
+            selections=Selections(selections),
+            meta=Meta(string=string)
         )
 
     @staticmethod
@@ -71,13 +73,13 @@ class StringToLines(
         ).print_lines_selections()
 
     def move_cursor_forward(self):
-        return StringToLines.project(self.string.move_cursor_forward())
+        return StringToLines.project(self.meta.string.move_cursor_forward())
 
     def move_cursor_back(self):
-        return StringToLines.project(self.string.move_cursor_back())
+        return StringToLines.project(self.meta.string.move_cursor_back())
 
     def select_next_word(self):
-        return StringToLines.project(self.string.select_next_word())
+        return StringToLines.project(self.meta.string.select_next_word())
 
     def replace(self, text):
-        return StringToLines.project(self.string.replace(text))
+        return StringToLines.project(self.meta.string.replace(text))

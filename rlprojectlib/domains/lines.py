@@ -8,9 +8,9 @@ class Lines(
 ):
 
     @staticmethod
-    def create(lines, selections):
+    def create(lines, selections, meta=None):
         return Lines(
-            meta=None,
+            meta=meta,
             lines=ImmutableList(lines),
             selections=Selections(selections)
         )
