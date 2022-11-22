@@ -20,16 +20,16 @@ class Lines(
         self.selections.print()
 
     def move_cursor_forward(self):
-        return NotImplementedError()
+        raise NotImplementedError()
 
     def move_cursor_back(self):
-        return NotImplementedError()
+        raise NotImplementedError()
 
     def select_next_word(self):
-        return NotImplementedError()
+        raise NotImplementedError()
 
     def replace(self, text):
-        return NotImplementedError()
+        raise NotImplementedError()
 
 class Line(
     namedtuple("Line", "text number")

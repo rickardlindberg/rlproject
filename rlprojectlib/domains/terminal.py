@@ -56,6 +56,12 @@ class Terminal(
     def style(self, **kwargs):
         return self._replace(fragments=self.fragments.map(lambda x: x._replace(**kwargs)))
 
+    def keyboard_event(self, event):
+        raise NotImplementedError()
+
+    def size_event(self, event):
+        raise NotImplementedError()
+
 class Cursor(
     namedtuple("Cursor", "x y"),
     Coordinate
