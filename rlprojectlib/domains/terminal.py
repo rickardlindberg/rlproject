@@ -4,12 +4,13 @@ from rlprojectlib.domains.generic import Coordinate
 from rlprojectlib.domains.generic import ImmutableList
 
 class Terminal(
-    namedtuple("Terminal", "fragments cursors"),
+    namedtuple("Terminal", "meta fragments cursors"),
 ):
 
     @staticmethod
-    def create(fragments=[], cursors=[]):
+    def create(fragments=[], cursors=[], meta=None):
         return Terminal(
+            meta=meta,
             fragments=ImmutableList(fragments),
             cursors=ImmutableList(cursors)
         )
@@ -25,7 +26,7 @@ class Terminal(
         )
 
     def clip(self, width, height):
-        return Terminal(
+        return self._replace(
             fragments=self.fragments.filter(lambda fragment:
                 fragment.y < height
             ).map(lambda fragment: fragment.clip(width)),
@@ -44,7 +45,7 @@ class Terminal(
         return self._replace(cursors=ImmutableList())
 
     def merge(self, terminal):
-        return Terminal(
+        return Terminal.create(
             fragments=self.fragments.merge(terminal.fragments),
             cursors=self.cursors.merge(terminal.cursors),
         )
