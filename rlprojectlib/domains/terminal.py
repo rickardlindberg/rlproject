@@ -7,9 +7,9 @@ class Terminal(
     namedtuple("Terminal", "meta fragments cursors"),
 ):
 
-    @staticmethod
-    def create(fragments=[], cursors=[], meta=None):
-        return Terminal(
+    @classmethod
+    def create(cls, fragments=[], cursors=[], meta=None):
+        return cls(
             meta=meta,
             fragments=ImmutableList(fragments),
             cursors=ImmutableList(cursors)

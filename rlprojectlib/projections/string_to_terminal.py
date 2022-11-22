@@ -14,10 +14,7 @@ class Meta(
 ):
     pass
 
-class StringToTerminal(
-    namedtuple("StringToTerminal", "projection"),
-    Projection
-):
+class StringToTerminal(Terminal):
 
     """
     I project a String to a Terminal.
@@ -59,12 +56,10 @@ class StringToTerminal(
             y=y,
             x=x
         ).replace_newlines(fg="MAGENTA"))
-        return StringToTerminal(
-            projection=Terminal.create(
-                fragments=fragments.get(),
-                cursors=cursors,
-                meta=Meta(string=string)
-            )
+        return StringToTerminal.create(
+            fragments=fragments.get(),
+            cursors=cursors,
+            meta=Meta(string=string)
         )
 
     @staticmethod
@@ -81,17 +76,17 @@ class StringToTerminal(
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
-            string = self.projection.meta.string.move_cursor_forward()
+            string = self.meta.string.move_cursor_forward()
         elif event.unicode_character == "\x02": # Ctrl-B
-            string = self.projection.meta.string.move_cursor_back()
+            string = self.meta.string.move_cursor_back()
         elif event.unicode_character == "\x0e": # Ctrl-N
-            string = self.projection.meta.string.select_next_word()
+            string = self.meta.string.select_next_word()
         elif event.unicode_character == "\x08": # Backspace
-            string = self.projection.meta.string.delete_back()
+            string = self.meta.string.delete_back()
         elif event.unicode_character and ord(event.unicode_character) >= 32:
-            string = self.projection.meta.string.replace(event.unicode_character)
+            string = self.meta.string.replace(event.unicode_character)
         else:
-            string = self.projection.meta.string
+            string = self.meta.string
         return StringToTerminal.project(string)
 
     def size_event(self, event):
