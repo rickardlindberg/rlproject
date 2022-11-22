@@ -7,9 +7,9 @@ class Lines(
     namedtuple("Lines", "meta lines selections")
 ):
 
-    @staticmethod
-    def create(lines, selections, meta=None):
-        return Lines(
+    @classmethod
+    def create(cls, lines, selections, meta=None):
+        return cls(
             meta=meta,
             lines=ImmutableList(lines),
             selections=Selections(selections)

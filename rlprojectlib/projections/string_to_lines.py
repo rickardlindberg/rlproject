@@ -1,7 +1,5 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import ImmutableList
-from rlprojectlib.domains.generic import Selections
 from rlprojectlib.domains.lines import Line
 from rlprojectlib.domains.lines import Lines
 from rlprojectlib.domains.lines import Position
@@ -60,9 +58,9 @@ class StringToLines(Lines):
                 if x <= selection.pos_end <= y:
                     end = Position(row=row, col=selection.pos_end-x)
             selections.append(Selection(start=start, end=end))
-        return StringToLines(
-            lines=ImmutableList(line[0] for line in lines),
-            selections=Selections(selections),
+        return StringToLines.create(
+            lines=(line[0] for line in lines),
+            selections=selections,
             meta=Meta(string=string)
         )
 
