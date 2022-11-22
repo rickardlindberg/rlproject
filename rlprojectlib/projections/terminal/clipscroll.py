@@ -6,10 +6,12 @@ from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
 from rlprojectlib.domains.terminal import Projection
 
-class ClipScroll(
-    namedtuple("ClipScroll", "projection terminal width height"),
-    Projection
+class Meta(
+    namedtuple("Meta", "terminal width height")
 ):
+    pass
+
+class ClipScroll(Terminal):
 
     @staticmethod
     def project(terminal, width=0, height=0):
@@ -21,7 +23,7 @@ class ClipScroll(
         ...     ),
         ...     width=2,
         ...     height=1,
-        ... ).projection.print_fragments_and_cursors()
+        ... ).print_fragments_and_cursors()
         TextFragment(x=0, y=0, text='o', bold=None, bg=None, fg=None)
         Cursor(x=1, y=0)
         """
@@ -35,22 +37,29 @@ class ClipScroll(
         else:
             dy = 0
         return ClipScroll(
-            projection=terminal.translate(dx=dx, dy=dy).clip(width, height),
-            terminal=terminal,
-            width=width,
-            height=height
+            *terminal.translate(
+                dx=dx,
+                dy=dy
+            ).clip(
+                width,
+                height
+            ).with_meta(Meta(
+                terminal=terminal,
+                width=width,
+                height=height
+            ))
         )
 
     def keyboard_event(self, event):
         return ClipScroll.project(
-            terminal=self.terminal.keyboard_event(event),
-            width=self.width,
-            height=self.height
+            terminal=self.meta.terminal.keyboard_event(event),
+            width=self.meta.width,
+            height=self.meta.height
         )
 
     def size_event(self, event):
         return ClipScroll.project(
-            terminal=self.terminal.size_event(event),
+            terminal=self.meta.terminal.size_event(event),
             width=event.width,
             height=event.height
         )

@@ -15,6 +15,9 @@ class Terminal(
             cursors=ImmutableList(cursors)
         )
 
+    def with_meta(self, meta):
+        return self._replace(meta=meta)
+
     def print_fragments_and_cursors(self):
         self.fragments.print()
         self.cursors.print()
