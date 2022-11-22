@@ -9,8 +9,13 @@ from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
 
+class Meta(
+    namedtuple("Meta", "string")
+):
+    pass
+
 class StringToTerminal(
-    namedtuple("StringToTerminal", "projection string"),
+    namedtuple("StringToTerminal", "projection"),
     Projection
 ):
 
@@ -57,9 +62,9 @@ class StringToTerminal(
         return StringToTerminal(
             projection=Terminal.create(
                 fragments=fragments.get(),
-                cursors=cursors
-            ),
-            string=string
+                cursors=cursors,
+                meta=Meta(string=string)
+            )
         )
 
     @staticmethod
@@ -76,17 +81,17 @@ class StringToTerminal(
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
-            string = self.string.move_cursor_forward()
+            string = self.projection.meta.string.move_cursor_forward()
         elif event.unicode_character == "\x02": # Ctrl-B
-            string = self.string.move_cursor_back()
+            string = self.projection.meta.string.move_cursor_back()
         elif event.unicode_character == "\x0e": # Ctrl-N
-            string = self.string.select_next_word()
+            string = self.projection.meta.string.select_next_word()
         elif event.unicode_character == "\x08": # Backspace
-            string = self.string.delete_back()
+            string = self.projection.meta.string.delete_back()
         elif event.unicode_character and ord(event.unicode_character) >= 32:
-            string = self.string.replace(event.unicode_character)
+            string = self.projection.meta.string.replace(event.unicode_character)
         else:
-            string = self.string
+            string = self.projection.meta.string
         return StringToTerminal.project(string)
 
     def size_event(self, event):
