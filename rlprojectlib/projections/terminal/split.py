@@ -5,10 +5,12 @@ from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
 
-class Split(
-    namedtuple("Split", "projection terminals width split_height"),
-    Projection
+class Meta(
+    namedtuple("Meta", "terminals width split_height")
 ):
+    pass
+
+class Split(Terminal):
 
     @staticmethod
     def project(terminals, width=0, split_height=0):
@@ -20,7 +22,7 @@ class Split(
         ...     Terminal.create(fragments=[
         ...         TextFragment(0, 0, "two")
         ...     ]),
-        ... ], width=10, split_height=1).projection.print_fragments_and_cursors()
+        ... ], width=10, split_height=1).print_fragments_and_cursors()
         TextFragment(x=0, y=0, text='one', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=1, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
         TextFragment(x=0, y=2, text='two', bold=None, bg=None, fg=None)
@@ -37,30 +39,32 @@ class Split(
             cursors.extend(terminal.cursors.map(lambda x: x.move(dy=dy)))
             dy += split_height
         return Split(
-            projection=Terminal.create(
+            *Terminal.create(
                 fragments=builder.get(),
-                cursors=cursors
-            ),
-            terminals=terminals,
-            width=width,
-            split_height=split_height
+                cursors=cursors,
+                meta=Meta(
+                    terminals=terminals,
+                    width=width,
+                    split_height=split_height
+                )
+            )
         )
 
     def keyboard_event(self, event):
         return Split.project(
-            terminals=[x.keyboard_event(event) for x in self.terminals],
-            width=self.width,
-            split_height=self.split_height,
+            terminals=[x.keyboard_event(event) for x in self.meta.terminals],
+            width=self.meta.width,
+            split_height=self.meta.split_height,
         )
 
     def size_event(self, event):
-        number_of_bars = len(self.terminals) - 1
+        number_of_bars = len(self.meta.terminals) - 1
         split_height = max(
             1,
-            (event.height - number_of_bars) // len(self.terminals)
+            (event.height - number_of_bars) // len(self.meta.terminals)
         )
         sized_terminal_texts = []
-        for terminal in self.terminals:
+        for terminal in self.meta.terminals:
             sized_terminal_texts.append(terminal.size_event(event.resize(
                 height=split_height
             )))
