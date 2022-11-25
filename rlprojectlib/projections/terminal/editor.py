@@ -12,7 +12,7 @@ from rlprojectlib.projections.terminal.clipscroll import ClipScroll
 from rlprojectlib.projections.terminal.split import Split
 
 class Meta(
-    namedtuple("Meta", "terminal width popup")
+    namedtuple("Meta", "terminal width popup document")
 ):
     pass
 
@@ -28,8 +28,14 @@ class Editor(Terminal):
     >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
 
     >>> project, document = Editor.create_projection_document("rlproject.py")
+    >>> isinstance(document, String)
+    True
     >>> terminal = project(document)
     >>> isinstance(terminal, Terminal)
+    True
+
+    >>> document = terminal.new_size_event(SizeEvent(10, 10))
+    >>> isinstance(document, String)
     True
     """
 
@@ -50,7 +56,8 @@ class Editor(Terminal):
                             document
                         ),
                     ),
-                ])
+                ]),
+                document=document
             )
         return (project, String.from_file(path))
 
@@ -74,7 +81,7 @@ class Editor(Terminal):
         )
 
     @staticmethod
-    def project(terminal, event=None, width=0, ms=0, popup=None):
+    def project(terminal, event=None, width=0, ms=0, popup=None, document=None):
         """
         I project a status bar followed by the given terminal text:
 
@@ -117,7 +124,8 @@ class Editor(Terminal):
             *projection.with_meta(Meta(
                 terminal=terminal,
                 width=width,
-                popup=popup
+                popup=popup,
+                document=document
             ))
         )
 
@@ -161,6 +169,9 @@ class Editor(Terminal):
             ms=ms,
             popup=self.meta.popup
         )
+
+    def new_size_event(self, event):
+        return self.meta.document
 
 def measure_ms(fn):
     t1 = time.perf_counter()
