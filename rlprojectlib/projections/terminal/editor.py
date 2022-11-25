@@ -21,6 +21,25 @@ class EditorState(
 ):
     pass
 
+class Driver:
+
+    def __init__(self, document, projection_fn):
+        self.document = document
+        self.projection_fn = projection_fn
+        self.project()
+
+    def project(self):
+        self.projection = self.projection_fn(self.document)
+        return self.projection
+
+    def size_event(self, event):
+        self.document = self.projection.new_size_event(event)
+        return self.project()
+
+    def keyboard_event(self, event):
+        self.document = self.projection.new_keyboard_event(event)
+        return self.project()
+
 class Editor(Terminal):
 
     """
@@ -32,28 +51,45 @@ class Editor(Terminal):
     >>> _ = terminal.size_event(SizeEvent(10, 10))
     >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
 
-    >>> project, document = Editor.create_projection_document("rlproject.py")
-    >>> isinstance(document, String)
-    True
-    >>> terminal = project(document)
-    >>> isinstance(terminal, Terminal)
+    Here is an attempt at a new driver design.
+
+    Some basic assumptions about types:
+
+    >>> driver = Editor.create_driver("rlproject.py")
+
+    >>> isinstance(driver.document, String)
     True
 
-    >>> document = terminal.new_size_event(SizeEvent(20, 10))
-    >>> isinstance(document, String)
+    >>> isinstance(driver.document.meta, EditorState)
     True
-    >>> document.meta.width
+
+    >>> isinstance(driver.projection, Terminal)
+    True
+
+    A size event changes the editor state:
+
+    >>> _ = driver.size_event(SizeEvent(20, 10))
+    >>> driver.document.meta.width
     20
-    >>> document.meta.height
+    >>> driver.document.meta.height
     10
 
-    >>> document = terminal.new_keyboard_event(KeyboardEvent(unicode_character="\x07"))
-    >>> document.meta.popup
+    A Ctrl-G opens the popup:
+
+    >>> driver.document.meta.popup is None
+    True
+
+    >>> _ = driver.keyboard_event(KeyboardEvent(unicode_character="\x07"))
+    >>> driver.document.meta.popup
     String(meta=None, string='', selections=Selections(Selection(start=0, length=0)))
+
+    >>> _ = driver.keyboard_event(KeyboardEvent(unicode_character="\x07"))
+    >>> driver.document.meta.popup is None
+    True
     """
 
     @staticmethod
-    def create_projection_document(path):
+    def create_driver(path):
         def project(document):
             return Editor.project(
                 Split.project([
@@ -72,7 +108,10 @@ class Editor(Terminal):
                 ]),
                 document=document
             )
-        return (project, String.from_file(path).with_meta(EditorState(10, 10, None)))
+        return Driver(
+            String.from_file(path).with_meta(EditorState(10, 10, None)),
+            project
+        )
 
     @staticmethod
     def from_file(path):
@@ -192,7 +231,9 @@ class Editor(Terminal):
     def new_keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
             if self.meta.document.meta.popup:
-                pass
+                return self.meta.document.with_meta(self.meta.document.meta._replace(
+                    popup=None
+                ))
             else:
                 return self.meta.document.with_meta(self.meta.document.meta._replace(
                     popup=String.from_string('')
