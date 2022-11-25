@@ -17,7 +17,7 @@ class Meta(
     pass
 
 class EditorState(
-    namedtuple("Meta", "width height")
+    namedtuple("Meta", "width height popup")
 ):
     pass
 
@@ -46,6 +46,10 @@ class Editor(Terminal):
     20
     >>> document.meta.height
     10
+
+    >>> document = terminal.new_keyboard_event(KeyboardEvent(unicode_character="\x07"))
+    >>> document.meta.popup
+    String(meta=None, string='', selections=Selections(Selection(start=0, length=0)))
     """
 
     @staticmethod
@@ -68,7 +72,7 @@ class Editor(Terminal):
                 ]),
                 document=document
             )
-        return (project, String.from_file(path).with_meta(EditorState(10, 10)))
+        return (project, String.from_file(path).with_meta(EditorState(10, 10, None)))
 
     @staticmethod
     def from_file(path):
@@ -184,6 +188,15 @@ class Editor(Terminal):
             width=event.width,
             height=event.height
         ))
+
+    def new_keyboard_event(self, event):
+        if event.unicode_character == "\x07": # Ctrl-G
+            if self.meta.document.meta.popup:
+                pass
+            else:
+                return self.meta.document.with_meta(self.meta.document.meta._replace(
+                    popup=String.from_string('')
+                ))
 
 def measure_ms(fn):
     t1 = time.perf_counter()
