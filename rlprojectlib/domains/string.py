@@ -19,6 +19,9 @@ class String(
             selections=Selections([Selection(selection_start, selection_length)])
         )
 
+    def with_meta(self, meta):
+        return self._replace(meta=meta)
+
     def replace(self, text):
         """
         >>> String.from_string("hello", selection_length=1).replace("1").string

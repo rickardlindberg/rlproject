@@ -16,6 +16,11 @@ class Meta(
 ):
     pass
 
+class EditorState(
+    namedtuple("Meta", "width height")
+):
+    pass
+
 class Editor(Terminal):
 
     """
@@ -34,9 +39,13 @@ class Editor(Terminal):
     >>> isinstance(terminal, Terminal)
     True
 
-    >>> document = terminal.new_size_event(SizeEvent(10, 10))
+    >>> document = terminal.new_size_event(SizeEvent(20, 10))
     >>> isinstance(document, String)
     True
+    >>> document.meta.width
+    20
+    >>> document.meta.height
+    10
     """
 
     @staticmethod
@@ -59,7 +68,7 @@ class Editor(Terminal):
                 ]),
                 document=document
             )
-        return (project, String.from_file(path))
+        return (project, String.from_file(path).with_meta(EditorState(10, 10)))
 
     @staticmethod
     def from_file(path):
@@ -171,7 +180,10 @@ class Editor(Terminal):
         )
 
     def new_size_event(self, event):
-        return self.meta.document
+        return self.meta.document.with_meta(self.meta.document.meta._replace(
+            width=event.width,
+            height=event.height
+        ))
 
 def measure_ms(fn):
     t1 = time.perf_counter()
