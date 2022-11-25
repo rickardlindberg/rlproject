@@ -2,9 +2,11 @@ from collections import namedtuple
 
 from rlprojectlib.domains.generic import Coordinate
 from rlprojectlib.domains.generic import ImmutableList
+from rlprojectlib.domains.generic import MetaDocument
 
 class Terminal(
     namedtuple("Terminal", "meta fragments cursors"),
+    MetaDocument
 ):
 
     @classmethod
@@ -14,9 +16,6 @@ class Terminal(
             fragments=ImmutableList(fragments),
             cursors=ImmutableList(cursors)
         )
-
-    def with_meta(self, meta):
-        return self._replace(meta=meta)
 
     def print_fragments_and_cursors(self):
         self.fragments.print()

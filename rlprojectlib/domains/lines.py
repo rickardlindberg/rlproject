@@ -1,10 +1,13 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import ImmutableList, Selections
+from rlprojectlib.domains.generic import ImmutableList
+from rlprojectlib.domains.generic import MetaDocument
+from rlprojectlib.domains.generic import Selections
 from rlprojectlib.domains.string import Selection as StringSelection
 
 class Lines(
-    namedtuple("Lines", "meta lines selections")
+    namedtuple("Lines", "meta lines selections"),
+    MetaDocument
 ):
 
     @classmethod

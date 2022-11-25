@@ -109,7 +109,7 @@ class Editor(Terminal):
                 document=document
             )
         return Driver(
-            String.from_file(path).with_meta(EditorState(10, 10, None)),
+            String.from_file(path).replace_meta(EditorState(10, 10, None)),
             project
         )
 
@@ -173,7 +173,7 @@ class Editor(Terminal):
                 status_fragment
             )
         return Editor(
-            *projection.with_meta(Meta(
+            *projection.replace_meta(Meta(
                 terminal=terminal,
                 width=width,
                 popup=popup,
@@ -223,7 +223,7 @@ class Editor(Terminal):
         )
 
     def new_size_event(self, event):
-        return self.meta.document.with_meta(self.meta.document.meta._replace(
+        return self.meta.document.replace_meta(self.meta.document.meta._replace(
             width=event.width,
             height=event.height
         ))
@@ -231,13 +231,13 @@ class Editor(Terminal):
     def new_keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
             if self.meta.document.meta.popup:
-                return self.meta.document.with_meta(self.meta.document.meta._replace(
+                return self.meta.document.with_meta(
                     popup=None
-                ))
+                )
             else:
-                return self.meta.document.with_meta(self.meta.document.meta._replace(
+                return self.meta.document.with_meta(
                     popup=String.from_string('')
-                ))
+                )
 
 def measure_ms(fn):
     t1 = time.perf_counter()

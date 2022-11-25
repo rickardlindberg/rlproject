@@ -1,9 +1,11 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.generic import MetaDocument
 from rlprojectlib.domains.generic import Selections
 
 class String(
-    namedtuple("String", "meta string selections")
+    namedtuple("String", "meta string selections"),
+    MetaDocument
 ):
 
     @staticmethod
@@ -18,9 +20,6 @@ class String(
             string=string,
             selections=Selections([Selection(selection_start, selection_length)])
         )
-
-    def with_meta(self, meta):
-        return self._replace(meta=meta)
 
     def replace(self, text):
         """

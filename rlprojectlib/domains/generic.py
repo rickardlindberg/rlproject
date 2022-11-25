@@ -1,3 +1,11 @@
+class MetaDocument:
+
+    def with_meta(self, **kwargs):
+        return self._replace(meta=self.meta._replace(**kwargs))
+
+    def replace_meta(self, meta):
+        return self._replace(meta=meta)
+
 class Coordinate:
 
     def move(self, dx=0, dy=0):

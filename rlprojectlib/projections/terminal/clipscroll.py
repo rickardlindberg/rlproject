@@ -42,7 +42,7 @@ class ClipScroll(Terminal):
             ).clip(
                 width,
                 height
-            ).with_meta(Meta(
+            ).replace_meta(Meta(
                 terminal=terminal,
                 width=width,
                 height=height
