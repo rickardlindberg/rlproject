@@ -1,12 +1,15 @@
 from collections import namedtuple
-
 import time
 
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
+from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
+from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
+from rlprojectlib.projections.terminal.clipscroll import ClipScroll
+from rlprojectlib.projections.terminal.split import Split
 
 class Meta(
     namedtuple("Meta", "terminal width popup")
@@ -23,17 +26,36 @@ class Editor(Terminal):
     >>> terminal = Editor.from_file("rlproject.py")
     >>> _ = terminal.size_event(SizeEvent(10, 10))
     >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
+
+    >>> project, document = Editor.create_projection_document("rlproject.py")
+    >>> terminal = project(document)
+    >>> isinstance(terminal, Terminal)
+    True
     """
 
     @staticmethod
+    def create_projection_document(path):
+        def project(document):
+            return Editor.project(
+                Split.project([
+                    ClipScroll.project(
+                        LinesToTerminal.project(
+                            StringToLines.project(
+                                document
+                            )
+                        ),
+                    ),
+                    ClipScroll.project(
+                        StringToTerminal.project(
+                            document
+                        ),
+                    ),
+                ])
+            )
+        return (project, String.from_file(path))
+
+    @staticmethod
     def from_file(path):
-        from rlprojectlib.domains.string import String
-        from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
-        from rlprojectlib.projections.string_to_lines import StringToLines
-        from rlprojectlib.projections.string_to_terminal import StringToTerminal
-        from rlprojectlib.projections.terminal.clipscroll import ClipScroll
-        from rlprojectlib.projections.terminal.editor import Editor
-        from rlprojectlib.projections.terminal.split import Split
         return Editor.project(
             Split.project([
                 ClipScroll.project(
