@@ -215,11 +215,11 @@ class Editor(Terminal):
         )
 
     def new_size_event(self, event):
-        return self.meta.document.replace_meta(self.meta.document.meta._replace(
+        return self.meta.document.with_meta(
             width=event.width,
             height=event.height,
             event=event
-        ))
+        )
 
     def new_keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
