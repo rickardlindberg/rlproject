@@ -74,6 +74,12 @@ class Editor(Terminal):
     @staticmethod
     def create_driver(path):
         def project(document):
+            split_height=max(
+                1,
+                (document.meta.height - 1 - 1) // 2
+                # number_of_bars = len(self.meta.terminals) - 1
+                # (height - number_of_bars) // len(self.meta.terminals)
+            )
             return Editor.project(
                 Split.project([
                     ClipScroll.project(
@@ -82,20 +88,19 @@ class Editor(Terminal):
                                 document
                             )
                         ),
+                        width=document.meta.width,
+                        height=split_height,
                     ),
                     ClipScroll.project(
                         StringToTerminal.project(
                             document
                         ),
+                        width=document.meta.width,
+                        height=split_height,
                     ),
                 ],
                     width=document.meta.width,
-                    split_height=max(
-                        1,
-                        (document.meta.height - 1 - 1) // 2
-                        # number_of_bars = len(self.meta.terminals) - 1
-                        # (height - number_of_bars) // len(self.meta.terminals)
-                    )
+                    split_height=split_height
                 ),
                 width=document.meta.width,
                 event=document.meta.event,
