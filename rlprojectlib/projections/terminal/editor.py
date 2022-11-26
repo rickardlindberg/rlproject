@@ -88,7 +88,15 @@ class Editor(Terminal):
                             document
                         ),
                     ),
-                ]),
+                ],
+                    width=document.meta.width,
+                    split_height=max(
+                        1,
+                        (document.meta.height - 1 - 1) // 2
+                        # number_of_bars = len(self.meta.terminals) - 1
+                        # (height - number_of_bars) // len(self.meta.terminals)
+                    )
+                ),
                 width=document.meta.width,
                 event=document.meta.event,
                 ms=666, # not possible to get here
