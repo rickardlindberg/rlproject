@@ -30,10 +30,15 @@ if __name__ == "__main__":
         if not result.wasSuccessful():
             sys.exit(1)
     else:
-        if sys.argv[1:]:
-            path = sys.argv[1]
-        else:
-            path = "rlproject.py"
+        import os
+        path = "rlproject.py"
+        for arg in sys.argv[1:]:
+            if os.path.exists(arg):
+                path = arg
         from rlprojectlib.drivers.wxterminal import WxTerminalDriver
         from rlprojectlib.projections.terminal.editor import Editor
-        WxTerminalDriver.run(Editor.from_file(path))
+        if "--new-style-driver" in sys.argv[1:]:
+            driver = Editor.create_driver(path)
+        else:
+            driver = Editor.from_file(path)
+        WxTerminalDriver.run(driver)
