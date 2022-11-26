@@ -19,7 +19,7 @@ class Meta(
     pass
 
 class EditorState(
-    namedtuple("Meta", "width height popup")
+    namedtuple("Meta", "width height popup event")
 ):
     pass
 
@@ -90,10 +90,16 @@ class Editor(Terminal):
                     ),
                 ]),
                 document=document,
-                width=document.meta.width
+                width=document.meta.width,
+                event=document.meta.event
             )
         return NewStyleDriver(
-            String.from_file(path).replace_meta(EditorState(10, 10, None)),
+            String.from_file(path).replace_meta(EditorState(
+                width=10,
+                height=10,
+                popup=None,
+                event=None
+            )),
             project
         )
 
@@ -211,19 +217,25 @@ class Editor(Terminal):
     def new_size_event(self, event):
         return self.meta.document.replace_meta(self.meta.document.meta._replace(
             width=event.width,
-            height=event.height
+            height=event.height,
+            event=event
         ))
 
     def new_keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
             if self.meta.document.meta.popup:
                 return self.meta.document.with_meta(
-                    popup=None
+                    popup=None,
+                    event=event
                 )
             else:
                 return self.meta.document.with_meta(
-                    popup=String.from_string('')
+                    popup=String.from_string(''),
+                    event=event
                 )
+        return self.meta.document.with_meta(
+            event=event
+        )
 
 def measure_ms(fn):
     t1 = time.perf_counter()
