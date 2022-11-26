@@ -74,4 +74,4 @@ class Split(Terminal):
         )
 
     def new_keyboard_event(self, event):
-        return self.meta.terminals[0].new_keyboard_event(event)
+        return self.meta.terminals[-1].new_keyboard_event(event)

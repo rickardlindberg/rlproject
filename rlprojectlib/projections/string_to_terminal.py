@@ -88,5 +88,19 @@ class StringToTerminal(Terminal):
             string = self.meta.string
         return StringToTerminal.project(string)
 
+    def new_keyboard_event(self, event):
+        if event.unicode_character == "\x06": # Ctrl-F
+            return self.meta.string.move_cursor_forward()
+        elif event.unicode_character == "\x02": # Ctrl-B
+            return self.meta.string.move_cursor_back()
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            return self.meta.string.select_next_word()
+        elif event.unicode_character == "\x08": # Backspace
+            return self.meta.string.delete_back()
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
+            return self.meta.string.replace(event.unicode_character)
+        else:
+            return self.meta.string
+
     def size_event(self, event):
         return self
