@@ -5,6 +5,8 @@ from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
+from rlprojectlib.drivers.wxterminal import NewStyleDriver
+from rlprojectlib.drivers.wxterminal import OldStyleDriver
 from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
 from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
@@ -20,25 +22,6 @@ class EditorState(
     namedtuple("Meta", "width height popup")
 ):
     pass
-
-class Driver:
-
-    def __init__(self, document, projection_fn):
-        self.document = document
-        self.projection_fn = projection_fn
-        self.project()
-
-    def project(self):
-        self.projection = self.projection_fn(self.document)
-        return self.projection
-
-    def size_event(self, event):
-        self.document = self.projection.new_size_event(event)
-        return self.project()
-
-    def keyboard_event(self, event):
-        self.document = self.projection.new_keyboard_event(event)
-        return self.project()
 
 class Editor(Terminal):
 
@@ -63,7 +46,7 @@ class Editor(Terminal):
     >>> isinstance(driver.document.meta, EditorState)
     True
 
-    >>> isinstance(driver.projection, Terminal)
+    >>> isinstance(driver.terminal, Terminal)
     True
 
     A size event changes the editor state:
@@ -108,28 +91,30 @@ class Editor(Terminal):
                 ]),
                 document=document
             )
-        return Driver(
+        return NewStyleDriver(
             String.from_file(path).replace_meta(EditorState(10, 10, None)),
             project
         )
 
     @staticmethod
     def from_file(path):
-        return Editor.project(
-            Split.project([
-                ClipScroll.project(
-                    LinesToTerminal.project(
-                        StringToLines.project(
+        return OldStyleDriver(
+            Editor.project(
+                Split.project([
+                    ClipScroll.project(
+                        LinesToTerminal.project(
+                            StringToLines.project(
+                                String.from_file(path)
+                            )
+                        ),
+                    ),
+                    ClipScroll.project(
+                        StringToTerminal.project(
                             String.from_file(path)
-                        )
+                        ),
                     ),
-                ),
-                ClipScroll.project(
-                    StringToTerminal.project(
-                        String.from_file(path)
-                    ),
-                ),
-            ])
+                ])
+            )
         )
 
     @staticmethod

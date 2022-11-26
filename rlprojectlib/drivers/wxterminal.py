@@ -6,10 +6,10 @@ from rlprojectlib.domains.terminal import SizeEvent
 class WxTerminalDriver(wx.Panel):
 
     @staticmethod
-    def run(terminal):
+    def run(driver):
         app = wx.App()
         main_frame = wx.Frame(None)
-        WxTerminalDriver(main_frame, terminal)
+        WxTerminalDriver(main_frame, driver)
         main_frame.Show()
         app.MainLoop()
 
@@ -29,9 +29,10 @@ class WxTerminalDriver(wx.Panel):
         },
     }
 
-    def __init__(self, parent, terminal):
+    def __init__(self, parent, driver):
         wx.Panel.__init__(self, parent, style=wx.NO_BORDER|wx.WANTS_CHARS)
-        self.terminal = terminal
+        self.driver = driver
+        self.terminal = driver.terminal
         self.cursor_blink_timer = wx.Timer(self)
         self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.Bind(wx.EVT_SIZE, self.on_size)
@@ -44,14 +45,14 @@ class WxTerminalDriver(wx.Panel):
 
     def on_size(self, evt):
         width, height = self.repaint_bitmap()
-        self.terminal = self.terminal.size_event(SizeEvent(
+        self.terminal = self.driver.size_event(SizeEvent(
             width=width,
             height=height
         ))
         self.repaint_bitmap()
 
     def on_char(self, evt):
-        self.terminal = self.terminal.keyboard_event(KeyboardEvent(
+        self.terminal = self.driver.keyboard_event(KeyboardEvent(
             unicode_character=chr(evt.GetUnicodeKey())
         ))
         self.repaint_bitmap()
@@ -123,3 +124,35 @@ class WxTerminalDriver(wx.Panel):
     def force_repaint_window(self):
         self.Refresh()
         self.Update()
+
+class NewStyleDriver:
+
+    def __init__(self, document, projection_fn):
+        self.document = document
+        self.projection_fn = projection_fn
+        self._project()
+
+    def size_event(self, event):
+        self.document = self.terminal.new_size_event(event)
+        return self._project()
+
+    def keyboard_event(self, event):
+        self.document = self.terminal.new_keyboard_event(event)
+        return self._project()
+
+    def _project(self):
+        self.terminal = self.projection_fn(self.document)
+        return self.terminal
+
+class OldStyleDriver:
+
+    def __init__(self, terminal):
+        self.terminal = terminal
+
+    def size_event(self, event):
+        self.terminal = self.terminal.size_event(event)
+        return self.terminal
+
+    def keyboard_event(self, event):
+        self.terminal = self.terminal.keyboard_event(event)
+        return self.terminal
