@@ -89,9 +89,11 @@ class Editor(Terminal):
                         ),
                     ),
                 ]),
-                document=document,
                 width=document.meta.width,
-                event=document.meta.event
+                event=document.meta.event,
+                ms=666, # not possible to get here
+                popup=None, # leave for now
+                document=document
             )
         return NewStyleDriver(
             String.from_file(path).replace_meta(EditorState(
