@@ -84,6 +84,10 @@ class Editor(Terminal):
                 # number_of_bars = len(self.meta.terminals) - 1
                 # (height - number_of_bars) // len(self.meta.terminals)
             )
+            if document.meta.popup:
+                popup = StringToTerminal.project(document.meta.popup)
+            else:
+                popup = None
             return Editor.project(
                 Split.project([
                     ClipScroll.project(
@@ -109,7 +113,7 @@ class Editor(Terminal):
                 width=document.meta.width,
                 event=document.meta.event,
                 ms=666, # not possible to get here
-                popup=None, # leave for now
+                popup=popup,
                 document=document
             )
         return NewStyleDriver(
@@ -252,9 +256,14 @@ class Editor(Terminal):
                     popup=String.from_string(''),
                     event=event
                 )
-        return self.meta.terminal.new_keyboard_event(event).with_meta(
-            event=event
-        )
+        elif self.meta.document.meta.popup:
+            return self.meta.document.with_meta(
+                popup=self.meta.popup.new_keyboard_event(event)
+            )
+        else:
+            return self.meta.terminal.new_keyboard_event(event).with_meta(
+                event=event
+            )
 
 def measure_ms(fn):
     t1 = time.perf_counter()
