@@ -89,7 +89,8 @@ class Editor(Terminal):
                         ),
                     ),
                 ]),
-                document=document
+                document=document,
+                width=document.meta.width
             )
         return NewStyleDriver(
             String.from_file(path).replace_meta(EditorState(10, 10, None)),
