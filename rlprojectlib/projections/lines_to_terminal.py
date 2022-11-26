@@ -83,5 +83,17 @@ class LinesToTerminal(Terminal):
             lines = self.meta.lines
         return LinesToTerminal.project(lines)
 
+    def new_keyboard_event(self, event):
+        if event.unicode_character == "\x06": # Ctrl-F
+            return self.meta.lines.move_cursor_forward_new()
+        elif event.unicode_character == "\x02": # Ctrl-B
+            return self.meta.lines.move_cursor_back_new()
+        elif event.unicode_character == "\x0e": # Ctrl-N
+            return self.meta.lines.select_next_word_new()
+        elif event.unicode_character and ord(event.unicode_character) >= 32:
+            return self.meta.lines.replace_new(event.unicode_character)
+        else:
+            return self.meta.lines.noop_new()
+
     def size_event(self, event):
         return self

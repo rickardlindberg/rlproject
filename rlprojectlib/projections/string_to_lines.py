@@ -70,13 +70,28 @@ class StringToLines(Lines):
         ).print_lines_selections()
 
     def move_cursor_forward(self):
-        return StringToLines.project(self.meta.string.move_cursor_forward())
+        return StringToLines.project(self.move_cursor_forward_new())
 
     def move_cursor_back(self):
-        return StringToLines.project(self.meta.string.move_cursor_back())
+        return StringToLines.project(self.move_cursor_back_new())
 
     def select_next_word(self):
-        return StringToLines.project(self.meta.string.select_next_word())
+        return StringToLines.project(self.select_next_word_new())
 
     def replace(self, text):
-        return StringToLines.project(self.meta.string.replace(text))
+        return StringToLines.project(self.replace_new(text))
+
+    def move_cursor_forward_new(self):
+        return self.meta.string.move_cursor_forward()
+
+    def move_cursor_back_new(self):
+        return self.meta.string.move_cursor_back()
+
+    def select_next_word_new(self):
+        return self.meta.string.select_next_word()
+
+    def replace_new(self, text):
+        return self.meta.string.replace(text)
+
+    def noop_new(self):
+        return self.meta.string

@@ -69,6 +69,10 @@ class Editor(Terminal):
     >>> _ = driver.keyboard_event(KeyboardEvent(unicode_character="\x07"))
     >>> driver.document.meta.popup is None
     True
+
+    >>> _ = driver.keyboard_event(KeyboardEvent(unicode_character="k"))
+    >>> driver.document.string[driver.document.selections[-1].start-1]
+    'k'
     """
 
     @staticmethod
@@ -248,7 +252,7 @@ class Editor(Terminal):
                     popup=String.from_string(''),
                     event=event
                 )
-        return self.meta.document.with_meta(
+        return self.meta.terminal.new_keyboard_event(event).with_meta(
             event=event
         )
 
