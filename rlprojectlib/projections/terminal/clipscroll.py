@@ -50,18 +50,4 @@ class ClipScroll(Terminal):
         )
 
     def keyboard_event(self, event):
-        return ClipScroll.project(
-            terminal=self.meta.terminal.keyboard_event(event),
-            width=self.meta.width,
-            height=self.meta.height
-        )
-
-    def size_event(self, event):
-        return ClipScroll.project(
-            terminal=self.meta.terminal.size_event(event),
-            width=event.width,
-            height=event.height
-        )
-
-    def new_keyboard_event(self, event):
-        return self.meta.terminal.new_keyboard_event(event)
+        return self.meta.terminal.keyboard_event(event)

@@ -125,7 +125,7 @@ class WxTerminalDriver(wx.Panel):
         self.Refresh()
         self.Update()
 
-class NewStyleDriver:
+class DocumentProjectionDriver:
 
     def __init__(self, document, projection_fn):
         self.document = document
@@ -133,26 +133,13 @@ class NewStyleDriver:
         self._project()
 
     def size_event(self, event):
-        self.document = self.terminal.new_size_event(event)
+        self.document = self.terminal.size_event(event)
         return self._project()
 
     def keyboard_event(self, event):
-        self.document = self.terminal.new_keyboard_event(event)
+        self.document = self.terminal.keyboard_event(event)
         return self._project()
 
     def _project(self):
         self.terminal = self.projection_fn(self.document)
-        return self.terminal
-
-class OldStyleDriver:
-
-    def __init__(self, terminal):
-        self.terminal = terminal
-
-    def size_event(self, event):
-        self.terminal = self.terminal.size_event(event)
-        return self.terminal
-
-    def keyboard_event(self, event):
-        self.terminal = self.terminal.keyboard_event(event)
         return self.terminal

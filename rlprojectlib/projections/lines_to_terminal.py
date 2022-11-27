@@ -72,28 +72,12 @@ class LinesToTerminal(Terminal):
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
-            lines = self.meta.lines.move_cursor_forward()
+            return self.meta.lines.move_cursor_forward()
         elif event.unicode_character == "\x02": # Ctrl-B
-            lines = self.meta.lines.move_cursor_back()
+            return self.meta.lines.move_cursor_back()
         elif event.unicode_character == "\x0e": # Ctrl-N
-            lines = self.meta.lines.select_next_word()
+            return self.meta.lines.select_next_word()
         elif event.unicode_character and ord(event.unicode_character) >= 32:
-            lines = self.meta.lines.replace(event.unicode_character)
+            return self.meta.lines.replace(event.unicode_character)
         else:
-            lines = self.meta.lines
-        return LinesToTerminal.project(lines)
-
-    def new_keyboard_event(self, event):
-        if event.unicode_character == "\x06": # Ctrl-F
-            return self.meta.lines.move_cursor_forward_new()
-        elif event.unicode_character == "\x02": # Ctrl-B
-            return self.meta.lines.move_cursor_back_new()
-        elif event.unicode_character == "\x0e": # Ctrl-N
-            return self.meta.lines.select_next_word_new()
-        elif event.unicode_character and ord(event.unicode_character) >= 32:
-            return self.meta.lines.replace_new(event.unicode_character)
-        else:
-            return self.meta.lines.noop_new()
-
-    def size_event(self, event):
-        return self
+            return self.meta.lines.get_edited_document()

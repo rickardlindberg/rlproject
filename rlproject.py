@@ -37,8 +37,4 @@ if __name__ == "__main__":
                 path = arg
         from rlprojectlib.drivers.wxterminal import WxTerminalDriver
         from rlprojectlib.projections.terminal.editor import Editor
-        if "--new-style-driver" in sys.argv[1:]:
-            driver = Editor.create_driver(path)
-        else:
-            driver = Editor.from_file(path)
-        WxTerminalDriver.run(driver)
+        WxTerminalDriver.run(Editor.create_driver(path))

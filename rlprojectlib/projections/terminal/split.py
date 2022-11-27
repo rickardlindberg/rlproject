@@ -50,28 +50,4 @@ class Split(Terminal):
         )
 
     def keyboard_event(self, event):
-        return Split.project(
-            terminals=[x.keyboard_event(event) for x in self.meta.terminals],
-            width=self.meta.width,
-            split_height=self.meta.split_height,
-        )
-
-    def size_event(self, event):
-        number_of_bars = len(self.meta.terminals) - 1
-        split_height = max(
-            1,
-            (event.height - number_of_bars) // len(self.meta.terminals)
-        )
-        sized_terminal_texts = []
-        for terminal in self.meta.terminals:
-            sized_terminal_texts.append(terminal.size_event(event.resize(
-                height=split_height
-            )))
-        return Split.project(
-            terminals=sized_terminal_texts,
-            width=event.width,
-            split_height=split_height
-        )
-
-    def new_keyboard_event(self, event):
-        return self.meta.terminals[-1].new_keyboard_event(event)
+        return self.meta.terminals[-1].keyboard_event(event)

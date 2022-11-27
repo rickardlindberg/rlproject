@@ -3,10 +3,11 @@ import time
 
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
+from rlprojectlib.domains.terminal import KeyboardEvent
+from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
-from rlprojectlib.drivers.wxterminal import NewStyleDriver
-from rlprojectlib.drivers.wxterminal import OldStyleDriver
+from rlprojectlib.drivers.wxterminal import DocumentProjectionDriver
 from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
 from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
@@ -27,14 +28,6 @@ class Editor(Terminal):
 
     """
     I can edit an example document without crashing:
-
-    >>> from rlprojectlib.domains.terminal import SizeEvent
-    >>> from rlprojectlib.domains.terminal import KeyboardEvent
-    >>> terminal = Editor.from_file("rlproject.py")
-    >>> _ = terminal.size_event(SizeEvent(10, 10))
-    >>> _ = terminal.keyboard_event(KeyboardEvent('a'))
-
-    Here is an attempt at a new driver design.
 
     Some basic assumptions about types:
 
@@ -120,7 +113,7 @@ class Editor(Terminal):
                 popup=popup,
                 document=document
             )
-        return NewStyleDriver(
+        return DocumentProjectionDriver(
             String.from_file(path).replace_meta(EditorState(
                 width=10,
                 height=10,
@@ -128,27 +121,6 @@ class Editor(Terminal):
                 event=None
             )),
             project
-        )
-
-    @staticmethod
-    def from_file(path):
-        return OldStyleDriver(
-            Editor.project(
-                Split.project([
-                    ClipScroll.project(
-                        LinesToTerminal.project(
-                            StringToLines.project(
-                                String.from_file(path)
-                            )
-                        ),
-                    ),
-                    ClipScroll.project(
-                        StringToTerminal.project(
-                            String.from_file(path)
-                        ),
-                    ),
-                ])
-            )
         )
 
     @staticmethod
@@ -200,55 +172,14 @@ class Editor(Terminal):
             ))
         )
 
-    def keyboard_event(self, event):
-        terminal = self.meta.terminal
-        popup = self.meta.popup
-        ms = 0
-        if self.meta.popup:
-            if event.unicode_character == "\x07":
-                popup = None
-            else:
-                popup, ms = measure_ms(lambda:
-                    self.meta.popup.keyboard_event(event)
-                )
-        elif event.unicode_character == "\x07":
-            popup = StringToTerminal.project(String.from_string(""))
-        else:
-            terminal, ms = measure_ms(lambda:
-                self.meta.terminal.keyboard_event(event)
-            )
-        return Editor.project(
-            terminal=terminal,
-            event=event,
-            width=self.meta.width,
-            ms=ms,
-            popup=popup
-        )
-
     def size_event(self, event):
-        if self.meta.popup:
-            popup_height = 1
-        else:
-            popup_height = 0
-        terminal, ms = measure_ms(lambda:
-            self.meta.terminal.size_event(event.resize(dh=-1-popup_height))
-        )
-        return Editor.project(
-            terminal=terminal,
-            event=event,
-            width=event.width,
-            ms=ms,
-            popup=self.meta.popup
-        )
-
-    def new_size_event(self, event):
         return self.meta.document.with_meta(
             width=event.width,
             height=event.height,
             event=event
         )
 
-    def new_keyboard_event(self, event):
+    def keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
             if self.meta.document.meta.popup:
                 return self.meta.document.with_meta(
@@ -262,10 +193,11 @@ class Editor(Terminal):
                 )
         elif self.meta.document.meta.popup:
             return self.meta.document.with_meta(
-                popup=self.meta.popup.new_keyboard_event(event)
+                popup=self.meta.popup.keyboard_event(event),
+                event=event
             )
         else:
-            return self.meta.terminal.new_keyboard_event(event).with_meta(
+            return self.meta.terminal.keyboard_event(event).with_meta(
                 event=event
             )
 
