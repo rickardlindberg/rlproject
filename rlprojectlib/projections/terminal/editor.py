@@ -78,18 +78,18 @@ class Editor(Terminal):
     @staticmethod
     def create_driver(path):
         def project(document):
-            split_height=max(
-                1,
-                (document.meta.height - 1 - 1) // 2
-                # number_of_bars = len(self.meta.terminals) - 1
-                # (height - number_of_bars) // len(self.meta.terminals)
-            )
-            if document.meta.popup:
-                popup = StringToTerminal.project(document.meta.popup)
-            else:
-                popup = None
-            return Editor.project(
-                Split.project([
+            def everything_but_the_editor():
+                split_height=max(
+                    1,
+                    (document.meta.height - 1 - 1) // 2
+                    # number_of_bars = len(self.meta.terminals) - 1
+                    # (height - number_of_bars) // len(self.meta.terminals)
+                )
+                if document.meta.popup:
+                    popup = StringToTerminal.project(document.meta.popup)
+                else:
+                    popup = None
+                split = Split.project([
                     ClipScroll.project(
                         LinesToTerminal.project(
                             StringToLines.project(
@@ -109,10 +109,14 @@ class Editor(Terminal):
                 ],
                     width=document.meta.width,
                     split_height=split_height
-                ),
+                )
+                return (popup, split)
+            (popup, split), ms = measure_ms(everything_but_the_editor)
+            return Editor.project(
+                split,
                 width=document.meta.width,
                 event=document.meta.event,
-                ms=666, # not possible to get here
+                ms=ms,
                 popup=popup,
                 document=document
             )
