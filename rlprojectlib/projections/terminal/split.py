@@ -5,7 +5,7 @@ from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
 
 class Meta(
-    namedtuple("Meta", "terminals width split_height")
+    namedtuple("Meta", "terminals")
 ):
     pass
 
@@ -43,8 +43,6 @@ class Split(Terminal):
                 cursors=cursors,
                 meta=Meta(
                     terminals=terminals,
-                    width=width,
-                    split_height=split_height
                 )
             )
         )
