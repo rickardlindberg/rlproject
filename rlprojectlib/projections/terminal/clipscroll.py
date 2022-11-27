@@ -13,7 +13,7 @@ class Meta(
 class ClipScroll(Terminal):
 
     @staticmethod
-    def project(terminal, width=0, height=0):
+    def project(terminal, width, height):
         """
         >>> ClipScroll.project(
         ...     terminal=Terminal.create(

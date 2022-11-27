@@ -79,7 +79,11 @@ class Editor(Terminal):
                     # (height - number_of_bars) // len(self.meta.terminals)
                 )
                 if document.meta.popup:
-                    popup = StringToTerminal.project(document.meta.popup)
+                    popup = StringToTerminal.project(
+                        document.meta.popup,
+                        x=0,
+                        y=0
+                    )
                 else:
                     popup = None
                 split = Split.project([
@@ -94,7 +98,9 @@ class Editor(Terminal):
                     ),
                     ClipScroll.project(
                         StringToTerminal.project(
-                            document
+                            document,
+                            x=0,
+                            y=0
                         ),
                         width=document.meta.width,
                         height=split_height,
@@ -124,14 +130,14 @@ class Editor(Terminal):
         )
 
     @staticmethod
-    def project(terminal, event=None, width=0, ms=0, popup=None, document=None):
+    def project(terminal, event, width, ms, popup, document):
         """
         I project a status bar followed by the given terminal text:
 
         >>> Editor.project(Terminal.create(
         ...     fragments=[TextFragment(0, 0, "hello")],
         ...     cursors=[Cursor(0, 0)]
-        ... )).print_fragments_and_cursors()
+        ... ), event=None, width=0, ms=0, popup=None, document=None).print_fragments_and_cursors()
         TextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=0, y=1)

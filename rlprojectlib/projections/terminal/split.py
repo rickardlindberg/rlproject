@@ -12,7 +12,7 @@ class Meta(
 class Split(Terminal):
 
     @staticmethod
-    def project(terminals, width=0, split_height=0):
+    def project(terminals, width, split_height):
         """
         >>> Split.project([
         ...     Terminal.create(fragments=[

@@ -32,7 +32,7 @@ class StringToTerminal(Terminal):
     """
 
     @staticmethod
-    def project(string, x=0, y=0):
+    def project(string, x, y):
         fragments = TextFragmentsBuilder()
         cursors = []
         last_pos = 0
@@ -70,7 +70,9 @@ class StringToTerminal(Terminal):
                 selections=Selections([
                     Selection(start=selection_start, length=selection_length)
                 ])
-            )
+            ),
+            x=0,
+            y=0
         ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
