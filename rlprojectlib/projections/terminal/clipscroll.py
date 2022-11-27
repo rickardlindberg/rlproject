@@ -6,7 +6,7 @@ from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
 
 class Meta(
-    namedtuple("Meta", "terminal width height")
+    namedtuple("Meta", "terminal")
 ):
     pass
 
@@ -43,9 +43,7 @@ class ClipScroll(Terminal):
                 width,
                 height
             ).replace_meta(Meta(
-                terminal=terminal,
-                width=width,
-                height=height
+                terminal=terminal
             ))
         )
 
