@@ -1,7 +1,7 @@
 class MetaDocument:
 
     def with_meta(self, **kwargs):
-        return self._replace(meta=self.meta._replace(**kwargs))
+        return self.replace_meta(self.meta._replace(**kwargs))
 
     def replace_meta(self, meta):
         return self._replace(meta=meta)
