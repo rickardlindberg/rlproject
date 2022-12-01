@@ -14,8 +14,8 @@ from rlprojectlib.projections.string_to_terminal import StringToTerminal
 from rlprojectlib.projections.terminal.clipscroll import ClipScroll
 from rlprojectlib.projections.terminal.split import Split
 
-class Meta(
-    namedtuple("Meta", "terminal popup document")
+class ProjectionState(
+    namedtuple("ProjectionState", "terminal popup_terminal document")
 ):
     pass
 
@@ -79,13 +79,13 @@ class Editor(Terminal):
                     # (height - number_of_bars) // len(self.meta.terminals)
                 )
                 if document.meta.popup:
-                    popup = StringToTerminal.project(
+                    popup_terminal = StringToTerminal.project(
                         document.meta.popup,
                         x=0,
                         y=0
                     )
                 else:
-                    popup = None
+                    popup_terminal = None
                 split = Split.project([
                     ClipScroll.project(
                         LinesToTerminal.project(
@@ -109,14 +109,14 @@ class Editor(Terminal):
                     width=document.meta.width,
                     split_height=split_height
                 )
-                return (popup, split)
-            (popup, split), ms = measure_ms(everything_but_the_editor)
+                return (popup_terminal, split)
+            (popup_terminal, split), ms = measure_ms(everything_but_the_editor)
             return Editor.project(
                 split,
                 width=document.meta.width,
                 event=document.meta.event,
                 ms=ms,
-                popup=popup,
+                popup_terminal=popup_terminal,
                 document=document
             )
         return DocumentProjectionDriver(
@@ -130,14 +130,14 @@ class Editor(Terminal):
         )
 
     @staticmethod
-    def project(terminal, event, width, ms, popup, document):
+    def project(terminal, event, width, ms, popup_terminal, document):
         """
         I project a status bar followed by the given terminal text:
 
         >>> Editor.project(Terminal.create(
         ...     fragments=[TextFragment(0, 0, "hello")],
         ...     cursors=[Cursor(0, 0)]
-        ... ), event=None, width=0, ms=0, popup=None, document=None).print_fragments_and_cursors()
+        ... ), event=None, width=0, ms=0, popup_terminal=None, document=None).print_fragments_and_cursors()
         TextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=0, y=1)
@@ -149,7 +149,7 @@ class Editor(Terminal):
             bg="MAGENTA",
             fg="WHITE"
         )
-        if popup:
+        if popup_terminal:
             projection = terminal.clear_cursors(
             ).translate(
                 dy=2
@@ -162,7 +162,7 @@ class Editor(Terminal):
                 bg="GREEN",
                 fg="WHITE",
                 bold=True
-            )).merge(popup.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
+            )).merge(popup_terminal.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
         else:
             projection = terminal.translate(
                 dy=1
@@ -170,9 +170,9 @@ class Editor(Terminal):
                 status_fragment
             )
         return Editor(
-            *projection.replace_meta(Meta(
+            *projection.replace_meta(ProjectionState(
                 terminal=terminal,
-                popup=popup,
+                popup_terminal=popup_terminal,
                 document=document
             ))
         )
@@ -198,7 +198,7 @@ class Editor(Terminal):
                 )
         elif self.meta.document.meta.popup:
             return self.meta.document.with_meta(
-                popup=self.meta.popup.keyboard_event(event),
+                popup=self.meta.popup_terminal.keyboard_event(event),
                 event=event
             )
         else:
