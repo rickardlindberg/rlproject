@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
@@ -46,6 +47,18 @@ class Split(Terminal):
                 )
             )
         )
+
+    def size_event(self, event):
+        """
+        A size event does nothing:
+
+        >>> t1 = Terminal.create(cursors=[Cursor(0, 0)])
+        >>> t2 = Terminal.create(cursors=[Cursor(0, 0)])
+        >>> terminals = [t1, t2]
+        >>> Split.project(terminals, 1, 1).size_event(None) is t2
+        True
+        """
+        return self.meta.terminals[-1].get_source()
 
     def keyboard_event(self, event):
         return self.meta.terminals[-1].keyboard_event(event)
