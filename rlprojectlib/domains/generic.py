@@ -6,6 +6,9 @@ class MetaDocument:
     def replace_meta(self, meta):
         return self._replace(meta=meta)
 
+    def get_edited_document(self):
+        return self.meta.string
+
 class Coordinate:
 
     def move(self, dx=0, dy=0):
