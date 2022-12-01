@@ -82,4 +82,9 @@ class StringToLines(Lines):
         return self.meta.string.replace(text)
 
     def get_source(self):
-        return self.meta.string
+        """
+        >>> string = String.from_string("one")
+        >>> StringToLines.project(string).get_source() is string
+        True
+        """
+        return self.meta.string.get_source()
