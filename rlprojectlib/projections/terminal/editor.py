@@ -15,7 +15,7 @@ from rlprojectlib.projections.terminal.clipscroll import ClipScroll
 from rlprojectlib.projections.terminal.split import Split
 
 class Meta(
-    namedtuple("Meta", "terminal width popup document")
+    namedtuple("Meta", "terminal popup document")
 ):
     pass
 
@@ -172,7 +172,6 @@ class Editor(Terminal):
         return Editor(
             *projection.replace_meta(Meta(
                 terminal=terminal,
-                width=width,
                 popup=popup,
                 document=document
             ))
