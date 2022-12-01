@@ -11,7 +11,7 @@ class Lines(
 ):
 
     @classmethod
-    def create(cls, lines, selections, meta=None):
+    def create(cls, lines, selections=[], meta=None):
         return cls(
             meta=meta,
             lines=ImmutableList(lines),

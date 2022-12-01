@@ -21,19 +21,26 @@ class LinesToTerminal(Terminal):
     @staticmethod
     def project(lines):
         """
-        >>> LinesToTerminal.test_project([
-        ...     Line(text="one", number=1),
-        ...     Line(text="two", number=2),
-        ... ])
+        >>> LinesToTerminal.project(Lines.create(
+        ...     lines=[
+        ...         Line(text="one", number=1),
+        ...         Line(text="two", number=2),
+        ...     ]
+        ... )).print_fragments_and_cursors()
         TextFragment(x=0, y=0, text='1', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=0, text='one', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=1, text='2', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=1, text='two', bold=None, bg=None, fg=None)
 
-        >>> LinesToTerminal.test_project([
-        ...     Line(text="one", number=1),
-        ...     Line(text="two", number=2),
-        ... ], [Selection(start=Position(row=0, col=0), end=Position(row=0, col=1))])
+        >>> LinesToTerminal.project(Lines.create(
+        ...     lines=[
+        ...         Line(text="one", number=1),
+        ...         Line(text="two", number=2),
+        ...     ],
+        ...     selections=[
+        ...         Selection(start=Position(row=0, col=0), end=Position(row=0, col=1))
+        ...     ]
+        ... )).print_fragments_and_cursors()
         TextFragment(x=0, y=0, text='1', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=0, text='o', bold=None, bg='YELLOW', fg=None)
         TextFragment(x=3, y=0, text='ne', bold=None, bg=None, fg=None)
@@ -63,12 +70,6 @@ class LinesToTerminal(Terminal):
                 lines=lines
             )
         )
-
-    @staticmethod
-    def test_project(lines, selections=[]):
-        LinesToTerminal.project(
-            Lines.create(lines=lines, selections=selections)
-        ).print_fragments_and_cursors()
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
