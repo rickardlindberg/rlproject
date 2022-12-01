@@ -1,5 +1,9 @@
 class Document:
 
+    """
+    A document is an immutable tuple with at least one filed called `meta`.
+    """
+
     def with_meta(self, **kwargs):
         return self.replace_meta(self.meta._replace(**kwargs))
 
