@@ -20,7 +20,7 @@ class Meta(
     pass
 
 class EditorState(
-    namedtuple("Meta", "width height popup event")
+    namedtuple("EditorState", "width height popup event")
 ):
     pass
 
