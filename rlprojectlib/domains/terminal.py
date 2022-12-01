@@ -2,11 +2,11 @@ from collections import namedtuple
 
 from rlprojectlib.domains.generic import Coordinate
 from rlprojectlib.domains.generic import ImmutableList
-from rlprojectlib.domains.generic import MetaDocument
+from rlprojectlib.domains.generic import Document
 
 class Terminal(
     namedtuple("Terminal", "meta fragments cursors"),
-    MetaDocument
+    Document
 ):
 
     @classmethod

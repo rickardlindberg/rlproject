@@ -1,11 +1,11 @@
 from collections import namedtuple
 
-from rlprojectlib.domains.generic import MetaDocument
+from rlprojectlib.domains.generic import Document
 from rlprojectlib.domains.generic import Selections
 
 class String(
     namedtuple("String", "meta string selections"),
-    MetaDocument
+    Document
 ):
 
     @staticmethod

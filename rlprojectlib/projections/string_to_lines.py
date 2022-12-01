@@ -81,5 +81,5 @@ class StringToLines(Lines):
     def replace(self, text):
         return self.meta.string.replace(text)
 
-    def get_edited_document(self):
+    def get_source(self):
         return self.meta.string

@@ -84,7 +84,7 @@ class LinesToTerminal(Terminal):
         >>> LinesToTerminal.project(lines).size_event(None) is lines
         True
         """
-        return self.meta.lines.get_edited_document()
+        return self.meta.lines.get_source()
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
@@ -96,4 +96,4 @@ class LinesToTerminal(Terminal):
         elif event.unicode_character and ord(event.unicode_character) >= 32:
             return self.meta.lines.replace(event.unicode_character)
         else:
-            return self.meta.lines.get_edited_document()
+            return self.meta.lines.get_source()

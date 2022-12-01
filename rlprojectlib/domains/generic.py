@@ -1,4 +1,4 @@
-class MetaDocument:
+class Document:
 
     def with_meta(self, **kwargs):
         return self.replace_meta(self.meta._replace(**kwargs))
@@ -6,7 +6,7 @@ class MetaDocument:
     def replace_meta(self, meta):
         return self._replace(meta=meta)
 
-    def get_edited_document(self):
+    def get_source(self):
         return self
 
 class Coordinate:
