@@ -47,5 +47,15 @@ class ClipScroll(Terminal):
             ))
         )
 
+    def size_event(self, event):
+        """
+        A size event does nothing:
+
+        >>> terminal = Terminal.create(cursors=[Cursor(0, 0)])
+        >>> ClipScroll.project(terminal, 1, 1).size_event(None) is terminal
+        True
+        """
+        return self.meta.terminal.get_source()
+
     def keyboard_event(self, event):
         return self.meta.terminal.keyboard_event(event)
