@@ -75,6 +75,16 @@ class StringToTerminal(Terminal):
             y=0
         ).print_fragments_and_cursors()
 
+    def size_event(self, event):
+        """
+        A size event does nothing:
+
+        >>> string = String.from_string("hello")
+        >>> StringToTerminal.project(string, 0, 0).size_event(None) is string
+        True
+        """
+        return self.meta.string.get_source()
+
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
             return self.meta.string.move_cursor_forward()
@@ -87,4 +97,4 @@ class StringToTerminal(Terminal):
         elif event.unicode_character and ord(event.unicode_character) >= 32:
             return self.meta.string.replace(event.unicode_character)
         else:
-            return self.meta.string
+            return self.meta.string.get_source()
