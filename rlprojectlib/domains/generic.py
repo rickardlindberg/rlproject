@@ -7,7 +7,7 @@ class MetaDocument:
         return self._replace(meta=meta)
 
     def get_edited_document(self):
-        return self.meta.string
+        return self
 
 class Coordinate:
 

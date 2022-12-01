@@ -71,6 +71,21 @@ class LinesToTerminal(Terminal):
             )
         )
 
+    def size_event(self, event):
+        """
+        A size event does nothing:
+
+        >>> lines = Lines.create(
+        ...     lines=[
+        ...         Line(text="one", number=1),
+        ...         Line(text="two", number=2),
+        ...     ]
+        ... )
+        >>> LinesToTerminal.project(lines).size_event(None) is lines
+        True
+        """
+        return self.meta.lines.get_edited_document()
+
     def keyboard_event(self, event):
         if event.unicode_character == "\x06": # Ctrl-F
             return self.meta.lines.move_cursor_forward()
