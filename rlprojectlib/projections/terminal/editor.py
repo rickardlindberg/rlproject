@@ -178,7 +178,7 @@ class Editor(Terminal):
         )
 
     def size_event(self, event):
-        return self.meta.document.with_meta(
+        return self.document.with_meta(
             width=event.width,
             height=event.height,
             event=event
@@ -186,25 +186,37 @@ class Editor(Terminal):
 
     def keyboard_event(self, event):
         if event.unicode_character == "\x07": # Ctrl-G
-            if self.meta.document.meta.popup:
-                return self.meta.document.with_meta(
+            if self.editor_state.popup:
+                return self.document.with_meta(
                     popup=None,
                     event=event
                 )
             else:
-                return self.meta.document.with_meta(
+                return self.document.with_meta(
                     popup=String.from_string(''),
                     event=event
                 )
-        elif self.meta.document.meta.popup:
-            return self.meta.document.with_meta(
-                popup=self.meta.popup_terminal.keyboard_event(event),
+        elif self.editor_state.popup:
+            return self.document.with_meta(
+                popup=self.projection_state.popup_terminal.keyboard_event(event),
                 event=event
             )
         else:
-            return self.meta.terminal.keyboard_event(event).with_meta(
+            return self.projection_state.terminal.keyboard_event(event).with_meta(
                 event=event
             )
+
+    @property
+    def editor_state(self):
+        return self.document.meta
+
+    @property
+    def document(self):
+        return self.projection_state.document
+
+    @property
+    def projection_state(self):
+        return self.meta
 
 def measure_ms(fn):
     t1 = time.perf_counter()
