@@ -70,55 +70,6 @@ class Editor(Terminal):
 
     @staticmethod
     def create_driver(path):
-        def project(document):
-            def everything_but_the_editor():
-                split_height=max(
-                    1,
-                    (document.meta.height - 1 - 1) // 2
-                    # number_of_bars = len(self.meta.terminals) - 1
-                    # (height - number_of_bars) // len(self.meta.terminals)
-                )
-                if document.meta.popup:
-                    popup_terminal = StringToTerminal.project(
-                        document.meta.popup,
-                        x=0,
-                        y=0
-                    )
-                else:
-                    popup_terminal = None
-                split = Split.project([
-                    ClipScroll.project(
-                        LinesToTerminal.project(
-                            StringToLines.project(
-                                document
-                            )
-                        ),
-                        width=document.meta.width,
-                        height=split_height,
-                    ),
-                    ClipScroll.project(
-                        StringToTerminal.project(
-                            document,
-                            x=0,
-                            y=0
-                        ),
-                        width=document.meta.width,
-                        height=split_height,
-                    ),
-                ],
-                    width=document.meta.width,
-                    split_height=split_height
-                )
-                return (popup_terminal, split)
-            (popup_terminal, split), ms = measure_ms(everything_but_the_editor)
-            return Editor.project(
-                split,
-                width=document.meta.width,
-                event=document.meta.event,
-                ms=ms,
-                popup_terminal=popup_terminal,
-                document=document
-            )
         return DocumentProjectionDriver(
             String.from_file(path).replace_meta(EditorState(
                 width=10,
@@ -126,7 +77,58 @@ class Editor(Terminal):
                 popup=None,
                 event=None
             )),
-            project
+            Editor.project_new
+        )
+
+    @staticmethod
+    def project_new(document):
+        def everything_but_the_editor():
+            split_height=max(
+                1,
+                (document.meta.height - 1 - 1) // 2
+                # number_of_bars = len(self.meta.terminals) - 1
+                # (height - number_of_bars) // len(self.meta.terminals)
+            )
+            if document.meta.popup:
+                popup_terminal = StringToTerminal.project(
+                    document.meta.popup,
+                    x=0,
+                    y=0
+                )
+            else:
+                popup_terminal = None
+            split = Split.project([
+                ClipScroll.project(
+                    LinesToTerminal.project(
+                        StringToLines.project(
+                            document
+                        )
+                    ),
+                    width=document.meta.width,
+                    height=split_height,
+                ),
+                ClipScroll.project(
+                    StringToTerminal.project(
+                        document,
+                        x=0,
+                        y=0
+                    ),
+                    width=document.meta.width,
+                    height=split_height,
+                ),
+            ],
+                width=document.meta.width,
+                split_height=split_height
+            )
+            return (popup_terminal, split)
+        (popup_terminal, split), ms = measure_ms(everything_but_the_editor)
+        return Editor.project(
+            split,
+            width=document.meta.width,
+            event=document.meta.event,
+            ms=ms,
+            popup_terminal=popup_terminal,
+            document=document
         )
 
     @staticmethod
