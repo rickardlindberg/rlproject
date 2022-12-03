@@ -77,75 +77,31 @@ class Editor(Terminal):
                 popup=None,
                 event=None
             )),
-            Editor.project_new
+            Editor.project
         )
 
     @staticmethod
-    def project_new(document):
-        def everything_but_the_editor():
-            split_height=max(
-                1,
-                (document.meta.height - 1 - 1) // 2
-                # number_of_bars = len(self.meta.terminals) - 1
-                # (height - number_of_bars) // len(self.meta.terminals)
-            )
-            if document.meta.popup:
-                popup_terminal = StringToTerminal.project(
-                    document.meta.popup,
-                    x=0,
-                    y=0
-                )
-            else:
-                popup_terminal = None
-            split = Split.project([
-                ClipScroll.project(
-                    LinesToTerminal.project(
-                        StringToLines.project(
-                            document
-                        )
-                    ),
-                    width=document.meta.width,
-                    height=split_height,
-                ),
-                ClipScroll.project(
-                    StringToTerminal.project(
-                        document,
-                        x=0,
-                        y=0
-                    ),
-                    width=document.meta.width,
-                    height=split_height,
-                ),
-            ],
-                width=document.meta.width,
-                split_height=split_height
-            )
-            return (popup_terminal, split)
-        (popup_terminal, split), ms = measure_ms(everything_but_the_editor)
-        return Editor.project(
-            split,
-            width=document.meta.width,
-            event=document.meta.event,
-            ms=ms,
-            popup_terminal=popup_terminal,
-            document=document
-        )
-
-    @staticmethod
-    def project(terminal, event, width, ms, popup_terminal, document):
+    def project(document):
         """
-        I project a status bar followed by the given terminal text:
-
-        >>> Editor.project(Terminal.create(
-        ...     fragments=[TextFragment(0, 0, "hello")],
-        ...     cursors=[Cursor(0, 0)]
-        ... ), event=None, width=0, ms=0, popup_terminal=None, document=None).print_fragments_and_cursors()
-        TextFragment(x=0, y=1, text='hello', bold=None, bg=None, fg=None)
-        TextFragment(x=0, y=0, text='None 0ms', bold=None, bg='MAGENTA', fg='WHITE')
-        Cursor(x=0, y=1)
+        >>> document = String.from_string("hello").replace_meta(EditorState(
+        ...     width=10,
+        ...     height=10,
+        ...     popup=None,
+        ...     event=None,
+        ... ))
+        >>> Editor.project(document).print_fragments_and_cursors()
+        TextFragment(x=0, y=1, text='1', bold=None, bg=None, fg='YELLOW')
+        TextFragment(x=2, y=1, text='hello', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=5, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
+        TextFragment(x=0, y=6, text='hello', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=0, text='None 0ms  ', bold=None, bg='MAGENTA', fg='WHITE')
+        Cursor(x=2, y=1)
+        Cursor(x=0, y=6)
         """
+        (popup_terminal, split), ms = measure_ms(lambda: Editor.everything_but_the_editor(document))
+        terminal = split
         status_fragment = TextFragment(
-            text=f"{event} {ms}ms".ljust(width),
+            text=f"{document.meta.event} {ms}ms".ljust(document.meta.width),
             x=0,
             y=0,
             bg="MAGENTA",
@@ -158,7 +114,7 @@ class Editor(Terminal):
             ).add_fragment(
                 status_fragment
             ).add_fragment(TextFragment(
-                text=f"Filter:".ljust(width),
+                text=f"Filter:".ljust(document.meta.width),
                 x=0,
                 y=1,
                 bg="GREEN",
@@ -178,6 +134,47 @@ class Editor(Terminal):
                 document=document
             ))
         )
+
+    @staticmethod
+    def everything_but_the_editor(document):
+        split_height=max(
+            1,
+            (document.meta.height - 1 - 1) // 2
+            # number_of_bars = len(self.meta.terminals) - 1
+            # (height - number_of_bars) // len(self.meta.terminals)
+        )
+        if document.meta.popup:
+            popup_terminal = StringToTerminal.project(
+                document.meta.popup,
+                x=0,
+                y=0
+            )
+        else:
+            popup_terminal = None
+        split = Split.project([
+            ClipScroll.project(
+                LinesToTerminal.project(
+                    StringToLines.project(
+                        document
+                    )
+                ),
+                width=document.meta.width,
+                height=split_height,
+            ),
+            ClipScroll.project(
+                StringToTerminal.project(
+                    document,
+                    x=0,
+                    y=0
+                ),
+                width=document.meta.width,
+                height=split_height,
+            ),
+        ],
+            width=document.meta.width,
+            split_height=split_height
+        )
+        return (popup_terminal, split)
 
     def size_event(self, event):
         return self.document.with_meta(
