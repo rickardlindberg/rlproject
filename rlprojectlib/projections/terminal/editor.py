@@ -1,5 +1,4 @@
 from collections import namedtuple
-import time
 
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
