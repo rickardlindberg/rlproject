@@ -1,6 +1,9 @@
+import time
+
 import wx
 
 from rlprojectlib.domains.terminal import KeyboardEvent
+from rlprojectlib.domains.terminal import MeasurementEvent
 from rlprojectlib.domains.terminal import SizeEvent
 
 class WxTerminalDriver(wx.Panel):
@@ -44,16 +47,27 @@ class WxTerminalDriver(wx.Panel):
         self.repaint_bitmap()
 
     def on_size(self, evt):
-        width, height = self.repaint_bitmap()
-        self.terminal = self.driver.size_event(SizeEvent(
-            width=width,
-            height=height
-        ))
-        self.repaint_bitmap()
+        def project():
+            width, height = self.repaint_bitmap()
+            self.terminal = self.driver.size_event(SizeEvent(
+                width=width,
+                height=height
+            ))
+        self._measure(project)
 
     def on_char(self, evt):
-        self.terminal = self.driver.keyboard_event(KeyboardEvent(
-            unicode_character=chr(evt.GetUnicodeKey())
+        def project():
+            self.terminal = self.driver.keyboard_event(KeyboardEvent(
+                unicode_character=chr(evt.GetUnicodeKey())
+            ))
+        self._measure(project)
+
+    def _measure(self, fn):
+        _, ms_project = measure_ms(fn)
+        _, ms_repaint = measure_ms(self.repaint_bitmap)
+        self.terminal = self.driver.measurement_event(MeasurementEvent(
+            ms_project=ms_project,
+            ms_repaint=ms_repaint,
         ))
         self.repaint_bitmap()
 
@@ -140,6 +154,16 @@ class DocumentProjectionDriver:
         self.document = self.terminal.keyboard_event(event)
         return self._project()
 
+    def measurement_event(self, event):
+        self.document = self.terminal.measurement_event(event)
+        return self._project()
+
     def _project(self):
         self.terminal = self.projection_fn(self.document)
         return self.terminal
+
+def measure_ms(fn):
+    t1 = time.perf_counter()
+    return_value = fn()
+    t2 = time.perf_counter()
+    return (return_value, int((t2-t1)*1000))

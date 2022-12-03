@@ -4,6 +4,7 @@ import time
 from rlprojectlib.domains.string import String
 from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import KeyboardEvent
+from rlprojectlib.domains.terminal import MeasurementEvent
 from rlprojectlib.domains.terminal import SizeEvent
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
@@ -20,7 +21,7 @@ class ProjectionState(
     pass
 
 class EditorState(
-    namedtuple("EditorState", "width height popup event")
+    namedtuple("EditorState", "width height popup event measurement_event")
 ):
     pass
 
@@ -75,7 +76,8 @@ class Editor(Terminal):
                 width=10,
                 height=10,
                 popup=None,
-                event=None
+                event=None,
+                measurement_event=MeasurementEvent(0, 0)
             )),
             Editor.project
         )
@@ -88,20 +90,21 @@ class Editor(Terminal):
         ...     height=10,
         ...     popup=None,
         ...     event=None,
+        ...     measurement_event=MeasurementEvent(0, 0)
         ... ))
         >>> Editor.project(document).print_fragments_and_cursors()
         TextFragment(x=0, y=1, text='1', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=1, text='hello', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=5, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
         TextFragment(x=0, y=6, text='hello', bold=None, bg=None, fg=None)
-        TextFragment(x=0, y=0, text='None 0ms  ', bold=None, bg='MAGENTA', fg='WHITE')
+        TextFragment(x=0, y=0, text='None 0ms 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=2, y=1)
         Cursor(x=0, y=6)
         """
         (popup_terminal, split), ms = measure_ms(lambda: Editor.everything_but_the_editor(document))
         terminal = split
         status_fragment = TextFragment(
-            text=f"{document.meta.event} {ms}ms".ljust(document.meta.width),
+            text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(document.meta.width),
             x=0,
             y=0,
             bg="MAGENTA",
@@ -204,6 +207,11 @@ class Editor(Terminal):
             return self.projection_state.terminal.keyboard_event(event).with_meta(
                 event=event
             )
+
+    def measurement_event(self, event):
+        return self.document.with_meta(
+            measurement_event=event
+        )
 
     @property
     def editor_state(self):

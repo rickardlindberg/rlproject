@@ -142,3 +142,8 @@ class SizeEvent(
         return self._replace(
             height=(self.height if height is None else height)+dh
         )
+
+class MeasurementEvent(
+    namedtuple("MeasurementEvent", "ms_project ms_repaint")
+):
+    pass
