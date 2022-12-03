@@ -44,14 +44,14 @@ class WxTerminalDriver(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.on_timer)
         self.Bind(wx.EVT_SET_FOCUS, self.on_set_focus)
         self.Bind(wx.EVT_KILL_FOCUS, self.on_kill_focus)
+        self.setup_font()
         self.repaint_bitmap()
 
     def on_size(self, evt):
         def project():
-            width, height = self.repaint_bitmap()
             self.terminal = self.driver.size_event(SizeEvent(
-                width=width,
-                height=height
+                width=evt.Size.Width // self.char_width,
+                height=evt.Size.Height // self.char_height
             ))
         self._measure(project)
 
@@ -93,43 +93,47 @@ class WxTerminalDriver(wx.Panel):
         self.show_cursors = True
         self.force_repaint_window()
 
-    def repaint_bitmap(self):
-        font = wx.Font(
+    def setup_font(self):
+        self.font = wx.Font(
             self.THEME["font_size"],
             wx.FONTFAMILY_TELETYPE,
             wx.FONTSTYLE_NORMAL,
             wx.FONTWEIGHT_NORMAL
         )
-        font_bold = font.Bold()
-        width, height = self.GetSize()
-        self.bitmap = wx.Bitmap(width, height)
+        self.font_bold = self.font.Bold()
+        self.bitmap = wx.Bitmap(10, 10)
+        memdc = wx.MemoryDC()
+        memdc.SelectObject(self.bitmap)
+        memdc.SetFont(self.font)
+        self.char_width, self.char_height = memdc.GetTextExtent(".")
+        del memdc
+
+    def repaint_bitmap(self):
+        self.bitmap = wx.Bitmap(self.GetSize())
         memdc = wx.MemoryDC()
         memdc.SelectObject(self.bitmap)
         memdc.SetBackground(wx.Brush(self.THEME["colors"]["BACKGROUND"], wx.SOLID))
         memdc.SetBackgroundMode(wx.PENSTYLE_SOLID)
         memdc.Clear()
-        memdc.SetFont(font)
-        char_width, char_height = memdc.GetTextExtent(".")
         for fragment in self.terminal.fragments:
             if fragment.bold:
-                memdc.SetFont(font_bold)
+                memdc.SetFont(self.font_bold)
             else:
-                memdc.SetFont(font)
+                memdc.SetFont(self.font)
             memdc.SetTextBackground(self.THEME["colors"].get(fragment.bg, self.THEME["colors"]["BACKGROUND"]))
             memdc.SetTextForeground(self.THEME["colors"].get(fragment.fg, self.THEME["colors"]["FOREGROUND"]))
-            memdc.DrawText(fragment.text, fragment.x*char_width, fragment.y*char_height)
+            memdc.DrawText(fragment.text, fragment.x*self.char_width, fragment.y*self.char_height)
         del memdc
         self.cursor_rects = []
         for cursor in self.terminal.cursors:
             self.cursor_rects.append(wx.Rect(
-                cursor.x*char_width-1,
-                cursor.y*char_height,
+                cursor.x*self.char_width-1,
+                cursor.y*self.char_height,
                 3,
-                char_height
+                self.char_height
             ))
         self.reset_cursor_blink()
         self.force_repaint_window()
-        return (width // char_width, height // char_height)
 
     def reset_cursor_blink(self):
         self.show_cursors = True
