@@ -101,45 +101,6 @@ class Editor(Terminal):
         Cursor(x=2, y=1)
         Cursor(x=0, y=6)
         """
-        (popup_terminal, split), ms = measure_ms(lambda: Editor.everything_but_the_editor(document))
-        terminal = split
-        status_fragment = TextFragment(
-            text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(document.meta.width),
-            x=0,
-            y=0,
-            bg="MAGENTA",
-            fg="WHITE"
-        )
-        if popup_terminal:
-            projection = terminal.clear_cursors(
-            ).translate(
-                dy=2
-            ).add_fragment(
-                status_fragment
-            ).add_fragment(TextFragment(
-                text=f"Filter:".ljust(document.meta.width),
-                x=0,
-                y=1,
-                bg="GREEN",
-                fg="WHITE",
-                bold=True
-            )).merge(popup_terminal.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
-        else:
-            projection = terminal.translate(
-                dy=1
-            ).add_fragment(
-                status_fragment
-            )
-        return Editor(
-            *projection.replace_meta(ProjectionState(
-                terminal=terminal,
-                popup_terminal=popup_terminal,
-                document=document
-            ))
-        )
-
-    @staticmethod
-    def everything_but_the_editor(document):
         split_height=max(
             1,
             (document.meta.height - 1 - 1) // 2
@@ -177,7 +138,41 @@ class Editor(Terminal):
             width=document.meta.width,
             split_height=split_height
         )
-        return (popup_terminal, split)
+        terminal = split
+        status_fragment = TextFragment(
+            text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(document.meta.width),
+            x=0,
+            y=0,
+            bg="MAGENTA",
+            fg="WHITE"
+        )
+        if popup_terminal:
+            projection = terminal.clear_cursors(
+            ).translate(
+                dy=2
+            ).add_fragment(
+                status_fragment
+            ).add_fragment(TextFragment(
+                text=f"Filter:".ljust(document.meta.width),
+                x=0,
+                y=1,
+                bg="GREEN",
+                fg="WHITE",
+                bold=True
+            )).merge(popup_terminal.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
+        else:
+            projection = terminal.translate(
+                dy=1
+            ).add_fragment(
+                status_fragment
+            )
+        return Editor(
+            *projection.replace_meta(ProjectionState(
+                terminal=terminal,
+                popup_terminal=popup_terminal,
+                document=document
+            ))
+        )
 
     def size_event(self, event):
         return self.document.with_meta(
@@ -224,9 +219,3 @@ class Editor(Terminal):
     @property
     def projection_state(self):
         return self.meta
-
-def measure_ms(fn):
-    t1 = time.perf_counter()
-    return_value = fn()
-    t2 = time.perf_counter()
-    return (return_value, int((t2-t1)*1000))
