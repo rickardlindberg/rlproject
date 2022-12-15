@@ -12,15 +12,23 @@ highlighted lines of text for example.
 It can provide custom projections for different scenarios and provide custom
 editing operations for different data structures.
 
-## Demos
+## Videos/Blog posts
+
+### 2022-10-28
 
 [Demo of new project that explores projectional, structured editing.](https://youtu.be/GUX3DQjVg4c)
 
 [![Demo of new project that explores projectional, structured editing.](https://img.youtube.com/vi/GUX3DQjVg4c/maxresdefault.jpg)](https://youtu.be/GUX3DQjVg4c "Demo of new project that explores projectional, structured editing.")
 
+### 2022-11-18
+
 [My projectional editor can do this now?!](https://youtu.be/qa_2Bk4bLyw)
 
 [![My projectional editor can do this now?!](https://img.youtube.com/vi/qa_2Bk4bLyw/maxresdefault.jpg)](https://youtu.be/qa_2Bk4bLyw "My projectional editor can do this now?!")
+
+### 2022-12-15
+
+[How should I evolve the design of my projectional editor?](http://rickardlindberg.me/writing/evolving-design-of-projectional-editor/)
 
 ## Inspiration
 
