@@ -100,14 +100,6 @@ class Editor(Terminal):
         TextFragment(x=0, y=6, text='hello', bold=None, bg=None, fg=None)
         Cursor(x=2, y=1)
         """
-        if document.meta.popup:
-            popup_terminal = StringToTerminal.project(
-                document.meta.popup,
-                x=0,
-                y=0
-            )
-        else:
-            popup_terminal = None
         splits = []
         splits.append(Options(
             Terminal.create(
@@ -122,6 +114,28 @@ class Editor(Terminal):
             0,
             False
         ))
+        if document.meta.popup:
+            popup_terminal = StringToTerminal.project(
+                document.meta.popup,
+                x=0,
+                y=0
+            )
+            splits.append(Options(
+                Terminal.create(
+                    fragments=[TextFragment(
+                        text=f"Filter:".ljust(document.meta.width),
+                        x=0,
+                        y=0,
+                        bg="GREEN",
+                        fg="WHITE",
+                        bold=True
+                    )]
+                ).merge(popup_terminal.style(bg="GREEN", fg="WHITE").translate(dx=8)),
+                0,
+                True
+            ))
+        else:
+            popup_terminal = None
         splits.append(Options(
             LinesToTerminal.project(
                 StringToLines.project(
@@ -129,7 +143,7 @@ class Editor(Terminal):
                 )
             ),
             1,
-            True
+            True if popup_terminal is None else False
         ))
         splits.append(Options(
             Terminal.create(
@@ -158,24 +172,9 @@ class Editor(Terminal):
             height=document.meta.height,
             width=document.meta.width
         )
-        terminal = split
-        if popup_terminal:
-            projection = terminal.clear_cursors(
-            ).translate(
-                dy=1
-            ).add_fragment(TextFragment(
-                text=f"Filter:".ljust(document.meta.width),
-                x=0,
-                y=1,
-                bg="GREEN",
-                fg="WHITE",
-                bold=True
-            )).merge(popup_terminal.style(bg="GREEN", fg="WHITE").translate(dy=1, dx=8))
-        else:
-            projection = terminal
         return Editor(
-            *projection.replace_meta(ProjectionState(
-                terminal=terminal,
+            *split.replace_meta(ProjectionState(
+                terminal=split,
                 popup_terminal=popup_terminal,
                 document=document
             ))
