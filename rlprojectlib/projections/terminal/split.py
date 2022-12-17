@@ -12,7 +12,7 @@ class Meta(
     pass
 
 class Options(
-    namedtuple("Options", "terminal,size,active")
+    namedtuple("Options", "terminal,proportion,active")
 ):
     pass
 
@@ -80,13 +80,13 @@ class VSplit(Terminal):
         height_left = height
         share_count = 0
         for option in options:
-            if option.size == 0:
+            if option.proportion == 0:
                 height_left -= option.terminal.get_height()
             else:
                 share_count += 1
         h = max(1, height_left // share_count)
         for option in options:
-            if option.size == 0:
+            if option.proportion == 0:
                 terminal_height = option.terminal.get_height()
             else:
                 terminal_height = h
