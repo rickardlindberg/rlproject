@@ -78,18 +78,17 @@ class VSplit(Terminal):
         dy = 0
         active = None
         height_left = height
-        share_count = 0
+        proportion_total = 0
         for option in options:
             if option.proportion == 0:
                 height_left -= option.terminal.get_height()
             else:
-                share_count += 1
-        h = max(1, height_left // share_count)
+                proportion_total += option.proportion
         for option in options:
             if option.proportion == 0:
                 terminal_height = option.terminal.get_height()
             else:
-                terminal_height = h
+                terminal_height = int(height_left * (option.proportion/proportion_total))
             terminal = ClipScroll.project(
                 option.terminal,
                 width=width,

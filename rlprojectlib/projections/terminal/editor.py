@@ -87,7 +87,7 @@ class Editor(Terminal):
         """
         >>> document = String.from_string("hello").replace_meta(EditorState(
         ...     width=12,
-        ...     height=10,
+        ...     height=6,
         ...     popup=None,
         ...     event=None,
         ...     measurement_event=MeasurementEvent(0, 0)
@@ -96,8 +96,8 @@ class Editor(Terminal):
         TextFragment(x=0, y=0, text='None 0ms 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         TextFragment(x=0, y=1, text='1', bold=None, bg=None, fg='YELLOW')
         TextFragment(x=2, y=1, text='hello', bold=None, bg=None, fg=None)
-        TextFragment(x=0, y=5, text='------------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
-        TextFragment(x=0, y=6, text='hello', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=4, text='------------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
+        TextFragment(x=0, y=5, text='hello', bold=None, bg=None, fg=None)
         Cursor(x=2, y=1)
         """
         splits = []
@@ -142,7 +142,7 @@ class Editor(Terminal):
                     document
                 )
             ),
-            1,
+            3,
             True if popup_terminal is None else False
         ))
         splits.append(Options(
