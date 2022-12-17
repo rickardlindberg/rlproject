@@ -4,61 +4,108 @@ from rlprojectlib.domains.terminal import Cursor
 from rlprojectlib.domains.terminal import Terminal
 from rlprojectlib.domains.terminal import TextFragment
 from rlprojectlib.domains.terminal import TextFragmentsBuilder
+from rlprojectlib.projections.terminal.clipscroll import ClipScroll
 
 class Meta(
-    namedtuple("Meta", "terminals")
+    namedtuple("Meta", "active_terminal")
 ):
     pass
 
-class Split(Terminal):
+class Options(
+    namedtuple("Options", "terminal,size,active")
+):
+    pass
+
+class VSplit(Terminal):
 
     @staticmethod
-    def project(terminals, width, split_height):
+    def project(options, height, width):
         """
-        >>> Split.project([
-        ...     Terminal.create(fragments=[
-        ...         TextFragment(0, 0, "one")
-        ...     ]),
-        ...     Terminal.create(fragments=[
-        ...         TextFragment(0, 0, "two")
-        ...     ]),
-        ... ], width=10, split_height=1).print_fragments_and_cursors()
-        TextFragment(x=0, y=0, text='one', bold=None, bg=None, fg=None)
-        TextFragment(x=0, y=1, text='----------', bold=None, bg='FOREGROUND', fg='BACKGROUND')
-        TextFragment(x=0, y=2, text='two', bold=None, bg=None, fg=None)
+        >>> terminal1 = Terminal.create(fragments=[
+        ...     TextFragment(x=0, y=0, text="one one"),
+        ...     TextFragment(x=0, y=1, text="one two"),
+        ... ], cursors=[Cursor(x=0, y=0)])
+        >>> terminal2 = Terminal.create(fragments=[
+        ...     TextFragment(x=0, y=0, text="two one"),
+        ...     TextFragment(x=0, y=1, text="two two"),
+        ... ], cursors=[Cursor(x=0, y=0)])
+
+        I lay out terminal windows vertically:
+
+        >>> VSplit.project([
+        ...     Options(terminal1, 1, True),
+        ...     Options(terminal2, 1, False),
+        ... ], 6, 10).print_fragments_and_cursors()
+        TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=3, text='two one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=4, text='two two', bold=None, bg=None, fg=None)
+        Cursor(x=0, y=0)
+
+        >>> VSplit.project([
+        ...     Options(terminal1, 0, True),
+        ...     Options(terminal2, 1, False),
+        ... ], 5, 10).print_fragments_and_cursors()
+        TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=2, text='two one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=3, text='two two', bold=None, bg=None, fg=None)
+        Cursor(x=0, y=0)
+
+        I clip terminals that do not fit:
+
+        >>> VSplit.project([
+        ...     Options(terminal1, 1, True),
+        ...     Options(terminal2, 1, False),
+        ... ], 2, 10).print_fragments_and_cursors()
+        TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=1, text='two one', bold=None, bg=None, fg=None)
+        Cursor(x=0, y=0)
+
+        Only cursors from the active terminal is shown:
+
+        >>> VSplit.project([
+        ...     Options(terminal1, 1, True),
+        ...     Options(terminal2, 1, False),
+        ... ], 4, 10).print_fragments_and_cursors()
+        TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=2, text='two one', bold=None, bg=None, fg=None)
+        TextFragment(x=0, y=3, text='two two', bold=None, bg=None, fg=None)
+        Cursor(x=0, y=0)
         """
         builder = TextFragmentsBuilder()
-        cursors = []
         dy = 0
-        for terminal in terminals:
-            if dy > 0:
-                builder.add(TextFragment(0, dy, "-"*width, bg="FOREGROUND", fg="BACKGROUND"))
-                dy += 1
-            for fragment in terminal.fragments:
-                builder.add(fragment.move(dy=dy))
-            cursors.extend(terminal.cursors.map(lambda x: x.move(dy=dy)))
-            dy += split_height
-        return Split(
-            *Terminal.create(
-                fragments=builder.get(),
-                cursors=cursors,
-                meta=Meta(
-                    terminals=terminals,
-                )
-            )
-        )
+        active = None
+        height_left = height
+        share_count = 0
+        for option in options:
+            if option.size == 0:
+                height_left -= option.terminal.get_height()
+            else:
+                share_count += 1
+        h = max(1, height_left // share_count)
+        for option in options:
+            if option.size == 0:
+                terminal_height = option.terminal.get_height()
+            else:
+                terminal_height = h
+            terminal = ClipScroll.project(
+                option.terminal,
+                width=width,
+                height=terminal_height
+            ).translate(dy=dy)
+            builder.extend(terminal.fragments)
+            dy += terminal_height
+            if option.active:
+                active = terminal
+        return VSplit(*Terminal.create(
+            fragments=builder.get(),
+            cursors=active.cursors
+        )).replace_meta(Meta(active_terminal=active))
 
     def size_event(self, event):
-        """
-        A size event does nothing:
-
-        >>> t1 = Terminal.create(cursors=[Cursor(0, 0)])
-        >>> t2 = Terminal.create(cursors=[Cursor(0, 0)])
-        >>> terminals = [t1, t2]
-        >>> Split.project(terminals, 1, 1).size_event(None) is t2
-        True
-        """
-        return self.meta.terminals[-1].get_source()
+        return self.meta.active_terminal.size_event(event)
 
     def keyboard_event(self, event):
-        return self.meta.terminals[-1].keyboard_event(event)
+        return self.meta.active_terminal.keyboard_event(event)

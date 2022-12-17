@@ -55,6 +55,24 @@ class Terminal(
     def style(self, **kwargs):
         return self._replace(fragments=self.fragments.map(lambda x: x._replace(**kwargs)))
 
+    def get_height(self):
+        """
+        >>> Terminal.create().get_height()
+        1
+
+        >>> Terminal.create(
+        ...     fragments=[TextFragment(x=0, y=1, text="")]
+        ... ).get_height()
+        2
+        """
+        return max(
+            tuple([0])
+            +
+            self.fragments.map(lambda fragment: fragment.y)
+            +
+            self.cursors.map(lambda cursor: cursor.y)
+        ) + 1
+
 class Cursor(
     namedtuple("Cursor", "x y"),
     Coordinate

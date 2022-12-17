@@ -26,12 +26,15 @@ class ClipScroll(Terminal):
         TextFragment(x=0, y=0, text='o', bold=None, bg=None, fg=None)
         Cursor(x=1, y=0)
         """
-        visible_cursor = terminal.cursors[-1]
-        if visible_cursor.x >= width:
+        if terminal.cursors:
+            visible_cursor = terminal.cursors[-1]
+        else:
+            visible_cursor = None
+        if visible_cursor and visible_cursor.x >= width:
             dx = width - visible_cursor.x - 1
         else:
             dx = 0
-        if visible_cursor.y >= height:
+        if visible_cursor and visible_cursor.y >= height:
             dy = height - visible_cursor.y - 1
         else:
             dy = 0

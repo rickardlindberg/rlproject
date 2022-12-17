@@ -12,7 +12,8 @@ from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
 from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 from rlprojectlib.projections.terminal.clipscroll import ClipScroll
-from rlprojectlib.projections.terminal.split import Split
+from rlprojectlib.projections.terminal.split import Options
+from rlprojectlib.projections.terminal.split import VSplit
 
 class ProjectionState(
     namedtuple("ProjectionState", "terminal popup_terminal document")
@@ -98,14 +99,7 @@ class Editor(Terminal):
         TextFragment(x=0, y=6, text='hello', bold=None, bg=None, fg=None)
         TextFragment(x=0, y=0, text='None 0ms 0ms', bold=None, bg='MAGENTA', fg='WHITE')
         Cursor(x=2, y=1)
-        Cursor(x=0, y=6)
         """
-        split_height=max(
-            1,
-            (document.meta.height - 1 - 1) // 2
-            # number_of_bars = len(self.meta.terminals) - 1
-            # (height - number_of_bars) // len(self.meta.terminals)
-        )
         if document.meta.popup:
             popup_terminal = StringToTerminal.project(
                 document.meta.popup,
@@ -114,28 +108,42 @@ class Editor(Terminal):
             )
         else:
             popup_terminal = None
-        split = Split.project([
-            ClipScroll.project(
-                LinesToTerminal.project(
-                    StringToLines.project(
-                        document
-                    )
+        split = VSplit.project(
+            [
+                Options(
+                    LinesToTerminal.project(
+                        StringToLines.project(
+                            document
+                        )
+                    ),
+                    1,
+                    True
                 ),
-                width=document.meta.width,
-                height=split_height,
-            ),
-            ClipScroll.project(
-                StringToTerminal.project(
-                    document,
-                    x=0,
-                    y=0
+                Options(
+                    Terminal.create(
+                        fragments=[TextFragment(
+                            x=0,
+                            y=0,
+                            bg="FOREGROUND",
+                            fg="BACKGROUND",
+                            text="-"*document.meta.width
+                        )]
+                    ),
+                    0,
+                    False
                 ),
-                width=document.meta.width,
-                height=split_height,
-            ),
-        ],
-            width=document.meta.width,
-            split_height=split_height
+                Options(
+                    StringToTerminal.project(
+                        document,
+                        x=0,
+                        y=0
+                    ),
+                    1,
+                    False
+                ),
+            ],
+            height=document.meta.height,
+            width=document.meta.width
         )
         terminal = split
         status_fragment = TextFragment(
