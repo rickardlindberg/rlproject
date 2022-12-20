@@ -105,6 +105,16 @@ Perhaps some of its ideas are applicable to a projectional editor?
 https://research.swtch.com/acme
 https://research.swtch.com/acme.pdf
 
+### Tree-sitter
+
+https://tree-sitter.github.io/tree-sitter/
+
+> Tree-sitter is a parser generator tool and an incremental parsing library. It
+> can build a concrete syntax tree for a source file and efficiently update the
+> syntax tree as the source file is edited.
+
+Can be used for syntax highlighting and language aware contexts/structures?
+
 ## Notes
 
 * Should not manage windows, leave that to window manager?
