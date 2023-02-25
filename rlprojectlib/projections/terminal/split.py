@@ -93,7 +93,7 @@ class Split(Terminal):
     222
     222
 
-    >>> SplitIntoColumns.project([
+    >>> one_space_two = lambda width, height: SplitIntoColumns.project([
     ...     Options(
     ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="1")]),
     ...         0,
@@ -109,28 +109,28 @@ class Split(Terminal):
     ...         0,
     ...         False
     ...     ),
-    ... ], width=5, height=5).print_ascii_layout()
+    ... ], width=width, height=height)
+
+    >>> one_space_two(5, 5).print_ascii_layout()
     1***2
+
+    >>> SplitIntoColumns.project([
+    ...     Options(
+    ...         one_space_two,
+    ...         1,
+    ...         True
+    ...     ),
+    ...     Options(
+    ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="x")]),
+    ...         1,
+    ...         False
+    ...     ),
+    ... ], width=10, height=10).print_ascii_layout()
+    1***2x
 
     >>> SplitIntoRows.project([
     ...     Options(
-    ...         lambda width, height: SplitIntoColumns.project([
-    ...             Options(
-    ...                 Terminal.create(fragments=[TextFragment(x=0, y=0, text="1")]),
-    ...                 0,
-    ...                 True
-    ...             ),
-    ...             Options(
-    ...                 lambda width, height: Terminal.create(fragments=[TextFragment(x=0, y=0, text="*"*width)]),
-    ...                 1,
-    ...                 True
-    ...             ),
-    ...             Options(
-    ...                 Terminal.create(fragments=[TextFragment(x=0, y=0, text="2")]),
-    ...                 0,
-    ...                 False
-    ...             ),
-    ...         ], width=width, height=height),
+    ...         one_space_two,
     ...         0,
     ...         True
     ...     ),
