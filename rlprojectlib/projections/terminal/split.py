@@ -296,4 +296,3 @@ class SplitIntoColumns(Split):
     @staticmethod
     def get_dx_xy(offset):
         return {"dx": offset}
-
