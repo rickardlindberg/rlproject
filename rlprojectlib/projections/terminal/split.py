@@ -92,6 +92,63 @@ class Split(Terminal):
     111
     222
     222
+
+    >>> SplitIntoColumns.project([
+    ...     Options(
+    ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="1")]),
+    ...         0,
+    ...         True
+    ...     ),
+    ...     Options(
+    ...         lambda width, height: Terminal.create(fragments=[TextFragment(x=0, y=0, text="*"*width)]),
+    ...         1,
+    ...         True
+    ...     ),
+    ...     Options(
+    ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="2")]),
+    ...         0,
+    ...         False
+    ...     ),
+    ... ], width=5, height=5).print_ascii_layout()
+    1***2
+
+    >>> SplitIntoRows.project([
+    ...     Options(
+    ...         lambda width, height: SplitIntoColumns.project([
+    ...             Options(
+    ...                 Terminal.create(fragments=[TextFragment(x=0, y=0, text="1")]),
+    ...                 0,
+    ...                 True
+    ...             ),
+    ...             Options(
+    ...                 lambda width, height: Terminal.create(fragments=[TextFragment(x=0, y=0, text="*"*width)]),
+    ...                 1,
+    ...                 True
+    ...             ),
+    ...             Options(
+    ...                 Terminal.create(fragments=[TextFragment(x=0, y=0, text="2")]),
+    ...                 0,
+    ...                 False
+    ...             ),
+    ...         ], width=width, height=height),
+    ...         0,
+    ...         True
+    ...     ),
+    ...     Options(
+    ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="x")]),
+    ...         1,
+    ...         False
+    ...     ),
+    ...     Options(
+    ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="y")]),
+    ...         1,
+    ...         False
+    ...     ),
+    ... ], width=5, height=5).print_ascii_layout()
+    1***2
+    x
+    <BLANKLINE>
+    y
     """
 
     @classmethod
