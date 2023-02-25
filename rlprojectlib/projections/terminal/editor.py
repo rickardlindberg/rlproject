@@ -102,9 +102,9 @@ class Editor(Terminal):
         """
         splits = []
         splits.append(Options(
-            Terminal.create(
+            lambda width, height: Terminal.create(
                 fragments=[TextFragment(
-                    text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(document.meta.width),
+                    text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(width),
                     x=0,
                     y=0,
                     bg="MAGENTA",
@@ -121,9 +121,9 @@ class Editor(Terminal):
                 y=0
             )
             splits.append(Options(
-                Terminal.create(
+                lambda width, height: Terminal.create(
                     fragments=[TextFragment(
-                        text=f"Filter:".ljust(document.meta.width),
+                        text=f"Filter:".ljust(width),
                         x=0,
                         y=0,
                         bg="GREEN",
@@ -146,13 +146,13 @@ class Editor(Terminal):
             True if popup_terminal is None else False
         ))
         splits.append(Options(
-            Terminal.create(
+            lambda width, height: Terminal.create(
                 fragments=[TextFragment(
                     x=0,
                     y=0,
                     bg="FOREGROUND",
                     fg="BACKGROUND",
-                    text="-"*document.meta.width
+                    text="-"*width
                 )]
             ),
             0,
