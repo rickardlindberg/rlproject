@@ -38,7 +38,7 @@ class Split(Terminal):
     ...     Options(lambda width, height: SplitIntoColumns.project([
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=6, height=1), 1, True),
+    ...     ], width=width, height=height), 1, True),
     ...     Options(terminal3, 1, False),
     ... ], width=6, height=2).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
@@ -49,7 +49,7 @@ class Split(Terminal):
     ...     Options(lambda width, height: SplitIntoRows.project([
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=4, height=2), 1, True),
+    ...     ], width=width, height=height), 1, True),
     ...     Options(terminal3, 1, False),
     ... ], width=4, height=4).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='1111', bold=None, bg=None, fg=None)
@@ -74,9 +74,10 @@ class Split(Terminal):
                 terminal_size = cls.get_size(option)
             else:
                 terminal_size = int(size_left * (option.proportion/proportion_total))
+            child_size = cls.get_child_size(width, height, terminal_size)
             terminal = ClipScroll.project(
-                option.calculate_terminal(None, None),
-                **cls.get_child_size(width, height, terminal_size)
+                option.calculate_terminal(**child_size),
+                **child_size
             ).translate(**cls.get_dx_xy(offset))
             builder.extend(terminal.fragments)
             offset += terminal_size
