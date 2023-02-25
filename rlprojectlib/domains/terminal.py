@@ -55,6 +55,29 @@ class Terminal(
     def style(self, **kwargs):
         return self._replace(fragments=self.fragments.map(lambda x: x._replace(**kwargs)))
 
+    def get_width(self):
+        """
+        >>> Terminal.create().get_width()
+        1
+
+        >>> Terminal.create(
+        ...     fragments=[TextFragment(x=1, y=0, text="hello")]
+        ... ).get_width()
+        6
+
+        >>> Terminal.create(
+        ...     cursors=[Cursor(x=1, y=0)]
+        ... ).get_width()
+        2
+        """
+        return max(
+            tuple([1])
+            +
+            self.fragments.map(lambda fragment: fragment.x+len(fragment.text))
+            +
+            self.cursors.map(lambda cursor: cursor.x+1)
+        )
+
     def get_height(self):
         """
         >>> Terminal.create().get_height()

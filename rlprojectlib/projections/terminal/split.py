@@ -126,3 +126,40 @@ class SplitIntoRows(Split):
     @staticmethod
     def get_dx_xy(offset):
         return {"dy": offset}
+
+class SplitIntoColumns(Split):
+
+    """
+    >>> terminal1 = Terminal.create(fragments=[
+    ...     TextFragment(x=0, y=0, text="111"),
+    ... ])
+    >>> terminal2 = Terminal.create(fragments=[
+    ...     TextFragment(x=0, y=0, text="222"),
+    ... ])
+
+    I lay out terminal windows in columns:
+
+    >>> SplitIntoColumns.project([
+    ...     Options(terminal1, 0, True),
+    ...     Options(terminal2, 0, False),
+    ... ], 6, 1).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
+    TextFragment(x=3, y=0, text='222', bold=None, bg=None, fg=None)
+    """
+
+    @staticmethod
+    def get_size(option):
+        return option.terminal.get_width()
+
+    @staticmethod
+    def get_start_size(width, height):
+        return width
+
+    @staticmethod
+    def get_child_size(width, height, size):
+        return {"width": size, "height": height}
+
+    @staticmethod
+    def get_dx_xy(offset):
+        return {"dx": offset}
+
