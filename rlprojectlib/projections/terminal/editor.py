@@ -13,7 +13,7 @@ from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 from rlprojectlib.projections.terminal.clipscroll import ClipScroll
 from rlprojectlib.projections.terminal.split import Options
-from rlprojectlib.projections.terminal.split import VSplit
+from rlprojectlib.projections.terminal.split import SplitIntoRows
 
 class ProjectionState(
     namedtuple("ProjectionState", "terminal popup_terminal document")
@@ -167,7 +167,7 @@ class Editor(Terminal):
             1,
             False
         ))
-        split = VSplit.project(
+        split = SplitIntoRows.project(
             splits,
             height=document.meta.height,
             width=document.meta.width

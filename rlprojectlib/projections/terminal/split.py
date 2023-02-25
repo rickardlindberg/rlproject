@@ -16,7 +16,7 @@ class Options(
 ):
     pass
 
-class VSplit(Terminal):
+class SplitIntoRows(Terminal):
 
     @staticmethod
     def project(options, height, width):
@@ -32,7 +32,7 @@ class VSplit(Terminal):
 
         I lay out terminal windows vertically:
 
-        >>> VSplit.project([
+        >>> SplitIntoRows.project([
         ...     Options(terminal1, 1, True),
         ...     Options(terminal2, 1, False),
         ... ], 6, 10).print_fragments_and_cursors()
@@ -42,7 +42,7 @@ class VSplit(Terminal):
         TextFragment(x=0, y=4, text='two two', bold=None, bg=None, fg=None)
         Cursor(x=0, y=0)
 
-        >>> VSplit.project([
+        >>> SplitIntoRows.project([
         ...     Options(terminal1, 0, True),
         ...     Options(terminal2, 1, False),
         ... ], 5, 10).print_fragments_and_cursors()
@@ -54,7 +54,7 @@ class VSplit(Terminal):
 
         I clip terminals that do not fit:
 
-        >>> VSplit.project([
+        >>> SplitIntoRows.project([
         ...     Options(terminal1, 1, True),
         ...     Options(terminal2, 1, False),
         ... ], 2, 10).print_fragments_and_cursors()
@@ -64,7 +64,7 @@ class VSplit(Terminal):
 
         Only cursors from the active terminal is shown:
 
-        >>> VSplit.project([
+        >>> SplitIntoRows.project([
         ...     Options(terminal1, 1, True),
         ...     Options(terminal2, 1, False),
         ... ], 4, 10).print_fragments_and_cursors()
@@ -98,7 +98,7 @@ class VSplit(Terminal):
             dy += terminal_height
             if option.active:
                 active = terminal
-        return VSplit(*Terminal.create(
+        return SplitIntoRows(*Terminal.create(
             fragments=builder.get(),
             cursors=active.cursors
         )).replace_meta(Meta(active_terminal=active))
