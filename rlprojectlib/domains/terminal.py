@@ -21,6 +21,38 @@ class Terminal(
         self.fragments.print()
         self.cursors.print()
 
+    def print_ascii_layout(self):
+        """
+        >>> terminal1 = Terminal.create(fragments=[
+        ...     TextFragment(x=0, y=0, text="1111111111"),
+        ...     TextFragment(x=0, y=1, text="1111111111"),
+        ... ]).print_ascii_layout()
+        1111111111
+        1111111111
+
+        >>> terminal1 = Terminal.create(fragments=[
+        ...     TextFragment(x=0, y=0, text="1111111111"),
+        ...     TextFragment(x=0, y=0, text="2"),
+        ... ]).print_ascii_layout()
+        2111111111
+        """
+        line_buffer = {}
+        for fragment in self.fragments:
+            if fragment.y not in line_buffer:
+                line_buffer[fragment.y] = {}
+            for index, char in enumerate(fragment.text):
+                line_buffer[fragment.y][fragment.x+index] = char
+        line_number = 0
+        while line_buffer:
+            line = line_buffer.pop(line_number, {})
+            colum_number = 0
+            char_buffer = []
+            while line:
+                char_buffer.append(line.pop(colum_number, " "))
+                colum_number += 1
+            print("".join(char_buffer))
+            line_number += 1
+
     def translate(self, dx=0, dy=0):
         return self._replace(
             fragments=self.fragments.map(lambda x: x.move(dx=dx, dy=dy)),

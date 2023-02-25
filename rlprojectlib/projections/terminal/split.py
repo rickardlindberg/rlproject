@@ -43,10 +43,9 @@ class Split(Terminal):
     ...         Options(terminal2, 1, False),
     ...     ], width=width, height=height), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=6, height=2).print_fragments_and_cursors()
-    TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
-    TextFragment(x=3, y=0, text='222', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=1, text='333333', bold=None, bg=None, fg=None)
+    ... ], width=6, height=2).print_ascii_layout()
+    111222
+    333333
 
     >>> SplitIntoRows.project([
     ...     Options(lambda width, height: SplitIntoRows.project([
@@ -54,11 +53,11 @@ class Split(Terminal):
     ...         Options(terminal2, 1, False),
     ...     ], width=width, height=height), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=4).print_fragments_and_cursors()
-    TextFragment(x=0, y=0, text='1111', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=1, text='2222', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=2, text='3333', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
+    ... ], width=4, height=4).print_ascii_layout()
+    1111
+    2222
+    3333
+    3333
 
     >>> SplitIntoRows.project([
     ...     Options(lambda width, height: SplitIntoColumns.project([
@@ -66,13 +65,12 @@ class Split(Terminal):
     ...         Options(terminal2, 1, False),
     ...     ], width=width, height=height), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=6).print_fragments_and_cursors()
-    TextFragment(x=0, y=0, text='11', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=1, text='11', bold=None, bg=None, fg=None)
-    TextFragment(x=2, y=0, text='22', bold=None, bg=None, fg=None)
-    TextFragment(x=2, y=1, text='22', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=4, text='3333', bold=None, bg=None, fg=None)
+    ... ], width=4, height=6).print_ascii_layout()
+    1122
+    1122
+    <BLANKLINE>
+    3333
+    3333
 
     >>> SplitIntoRows.project([
     ...     Options(lambda width, height: SplitIntoColumns.project([
@@ -80,22 +78,20 @@ class Split(Terminal):
     ...         Options(terminal2, 1, False),
     ...     ], width=width, height=height), 0, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=6).print_fragments_and_cursors()
-    TextFragment(x=0, y=0, text='11', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=1, text='11', bold=None, bg=None, fg=None)
-    TextFragment(x=2, y=0, text='22', bold=None, bg=None, fg=None)
-    TextFragment(x=2, y=1, text='22', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=2, text='3333', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
+    ... ], width=4, height=6).print_ascii_layout()
+    1122
+    1122
+    3333
+    3333
 
     >>> SplitIntoRows.project([
     ...     Options(terminal1, 0, True),
     ...     Options(terminal2, 0, False),
-    ... ], width=3, height=3).print_fragments_and_cursors()
-    TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=1, text='111', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=2, text='222', bold=None, bg=None, fg=None)
-    TextFragment(x=0, y=3, text='222', bold=None, bg=None, fg=None)
+    ... ], width=3, height=3).print_ascii_layout()
+    111
+    111
+    222
+    222
     """
 
     @classmethod
