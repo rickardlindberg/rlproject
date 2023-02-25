@@ -26,12 +26,15 @@ class Split(Terminal):
     """
     >>> terminal1 = Terminal.create(fragments=[
     ...     TextFragment(x=0, y=0, text="1111111111"),
+    ...     TextFragment(x=0, y=1, text="1111111111"),
     ... ])
     >>> terminal2 = Terminal.create(fragments=[
     ...     TextFragment(x=0, y=0, text="2222222222"),
+    ...     TextFragment(x=0, y=1, text="2222222222"),
     ... ])
     >>> terminal3 = Terminal.create(fragments=[
     ...     TextFragment(x=0, y=0, text="3333333333"),
+    ...     TextFragment(x=0, y=1, text="3333333333"),
     ... ])
 
     >>> SplitIntoRows.project([
@@ -55,6 +58,44 @@ class Split(Terminal):
     TextFragment(x=0, y=0, text='1111', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=1, text='2222', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=2, text='3333', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
+
+    >>> SplitIntoRows.project([
+    ...     Options(lambda width, height: SplitIntoColumns.project([
+    ...         Options(terminal1, 1, True),
+    ...         Options(terminal2, 1, False),
+    ...     ], width=width, height=height), 1, True),
+    ...     Options(terminal3, 1, False),
+    ... ], width=4, height=6).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='11', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=1, text='11', bold=None, bg=None, fg=None)
+    TextFragment(x=2, y=0, text='22', bold=None, bg=None, fg=None)
+    TextFragment(x=2, y=1, text='22', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=4, text='3333', bold=None, bg=None, fg=None)
+
+    >>> SplitIntoRows.project([
+    ...     Options(lambda width, height: SplitIntoColumns.project([
+    ...         Options(terminal1, 1, True),
+    ...         Options(terminal2, 1, False),
+    ...     ], width=width, height=height), 0, True),
+    ...     Options(terminal3, 1, False),
+    ... ], width=4, height=6).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='11', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=1, text='11', bold=None, bg=None, fg=None)
+    TextFragment(x=2, y=0, text='22', bold=None, bg=None, fg=None)
+    TextFragment(x=2, y=1, text='22', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=2, text='3333', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=3, text='3333', bold=None, bg=None, fg=None)
+
+    >>> SplitIntoRows.project([
+    ...     Options(terminal1, 0, True),
+    ...     Options(terminal2, 0, False),
+    ... ], width=3, height=3).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=1, text='111', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=2, text='222', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=3, text='222', bold=None, bg=None, fg=None)
     """
 
     @classmethod
@@ -66,12 +107,12 @@ class Split(Terminal):
         proportion_total = 0
         for option in options:
             if option.proportion == 0:
-                size_left -= cls.get_size(option)
+                size_left -= cls.get_size(width, height, option)
             else:
                 proportion_total += option.proportion
         for option in options:
             if option.proportion == 0:
-                terminal_size = cls.get_size(option)
+                terminal_size = cls.get_size(width, height, option)
             else:
                 terminal_size = int(size_left * (option.proportion/proportion_total))
             child_size = cls.get_child_size(width, height, terminal_size)
@@ -152,8 +193,8 @@ class SplitIntoRows(Split):
     """
 
     @staticmethod
-    def get_size(option):
-        return option.calculate_terminal(None, None).get_height()
+    def get_size(width, height, option):
+        return option.calculate_terminal(width, height).get_height()
 
     @staticmethod
     def get_start_size(width, height):
@@ -188,8 +229,8 @@ class SplitIntoColumns(Split):
     """
 
     @staticmethod
-    def get_size(option):
-        return option.calculate_terminal(None, None).get_width()
+    def get_size(width, height, option):
+        return option.calculate_terminal(width, height).get_width()
 
     @staticmethod
     def get_start_size(width, height):
