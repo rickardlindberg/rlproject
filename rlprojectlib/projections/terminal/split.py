@@ -12,11 +12,50 @@ class Meta(
     pass
 
 class Options(
-    namedtuple("Options", "terminal,proportion,active")
+    namedtuple("Options", "fn_or_terminal,proportion,active")
 ):
-    pass
+
+    def calculate_terminal(self, width, height):
+        if isinstance(self.fn_or_terminal, Terminal):
+            return self.fn_or_terminal
+        else:
+            return self.fn_or_terminal(width, height)
 
 class Split(Terminal):
+
+    """
+    >>> terminal1 = Terminal.create(fragments=[
+    ...     TextFragment(x=0, y=0, text="1111111111"),
+    ... ])
+    >>> terminal2 = Terminal.create(fragments=[
+    ...     TextFragment(x=0, y=0, text="2222222222"),
+    ... ])
+    >>> terminal3 = Terminal.create(fragments=[
+    ...     TextFragment(x=0, y=0, text="3333333333"),
+    ... ])
+
+    >>> SplitIntoRows.project([
+    ...     Options(lambda width, height: SplitIntoColumns.project([
+    ...         Options(terminal1, 1, True),
+    ...         Options(terminal2, 1, False),
+    ...     ], width=6, height=1), 1, True),
+    ...     Options(terminal3, 1, False),
+    ... ], width=6, height=2).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
+    TextFragment(x=3, y=0, text='222', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=1, text='333333', bold=None, bg=None, fg=None)
+
+    >>> SplitIntoRows.project([
+    ...     Options(lambda width, height: SplitIntoRows.project([
+    ...         Options(terminal1, 1, True),
+    ...         Options(terminal2, 1, False),
+    ...     ], width=4, height=2), 1, True),
+    ...     Options(terminal3, 1, False),
+    ... ], width=4, height=4).print_fragments_and_cursors()
+    TextFragment(x=0, y=0, text='1111', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=1, text='2222', bold=None, bg=None, fg=None)
+    TextFragment(x=0, y=2, text='3333', bold=None, bg=None, fg=None)
+    """
 
     @classmethod
     def project(cls, options, height, width):
@@ -36,7 +75,7 @@ class Split(Terminal):
             else:
                 terminal_size = int(size_left * (option.proportion/proportion_total))
             terminal = ClipScroll.project(
-                option.terminal,
+                option.calculate_terminal(None, None),
                 **cls.get_child_size(width, height, terminal_size)
             ).translate(**cls.get_dx_xy(offset))
             builder.extend(terminal.fragments)
@@ -113,7 +152,7 @@ class SplitIntoRows(Split):
 
     @staticmethod
     def get_size(option):
-        return option.terminal.get_height()
+        return option.calculate_terminal(None, None).get_height()
 
     @staticmethod
     def get_start_size(width, height):
@@ -149,7 +188,7 @@ class SplitIntoColumns(Split):
 
     @staticmethod
     def get_size(option):
-        return option.terminal.get_width()
+        return option.calculate_terminal(None, None).get_width()
 
     @staticmethod
     def get_start_size(width, height):
