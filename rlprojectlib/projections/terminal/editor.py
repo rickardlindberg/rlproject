@@ -12,7 +12,7 @@ from rlprojectlib.projections.lines_to_terminal import LinesToTerminal
 from rlprojectlib.projections.string_to_lines import StringToLines
 from rlprojectlib.projections.string_to_terminal import StringToTerminal
 from rlprojectlib.projections.terminal.clipscroll import ClipScroll
-from rlprojectlib.projections.terminal.split import Options
+from rlprojectlib.projections.terminal.split import Pane
 from rlprojectlib.projections.terminal.split import SplitIntoRows
 
 class ProjectionState(
@@ -101,7 +101,7 @@ class Editor(Terminal):
         Cursor(x=2, y=1)
         """
         splits = []
-        splits.append(Options(
+        splits.append(Pane(
             lambda width, height: Terminal.create(
                 fragments=[TextFragment(
                     text=f"{document.meta.event} {document.meta.measurement_event.ms_project}ms {document.meta.measurement_event.ms_repaint}ms".ljust(width),
@@ -120,7 +120,7 @@ class Editor(Terminal):
                 x=0,
                 y=0
             )
-            splits.append(Options(
+            splits.append(Pane(
                 lambda width, height: Terminal.create(
                     fragments=[TextFragment(
                         text=f"Filter:".ljust(width),
@@ -136,7 +136,7 @@ class Editor(Terminal):
             ))
         else:
             popup_terminal = None
-        splits.append(Options(
+        splits.append(Pane(
             LinesToTerminal.project(
                 StringToLines.project(
                     document
@@ -145,7 +145,7 @@ class Editor(Terminal):
             3,
             True if popup_terminal is None else False
         ))
-        splits.append(Options(
+        splits.append(Pane.create(
             lambda width, height: Terminal.create(
                 fragments=[TextFragment(
                     x=0,
@@ -155,22 +155,19 @@ class Editor(Terminal):
                     text="-"*width
                 )]
             ),
-            0,
-            False
+            proportion=0,
         ))
-        splits.append(Options(
+        splits.append(Pane.create(
             StringToTerminal.project(
                 document,
                 x=0,
                 y=0
-            ),
-            1,
-            False
+            )
         ))
         split = SplitIntoRows.project(
-            document.meta.width,
-            document.meta.height,
-            splits
+            splits,
+            width=document.meta.width,
+            height=document.meta.height
         )
         return Editor(
             *split.replace_meta(ProjectionState(
