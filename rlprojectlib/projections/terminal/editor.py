@@ -168,9 +168,9 @@ class Editor(Terminal):
             False
         ))
         split = SplitIntoRows.project(
-            splits,
-            height=document.meta.height,
-            width=document.meta.width
+            document.meta.width,
+            document.meta.height,
+            splits
         )
         return Editor(
             *split.replace_meta(ProjectionState(

@@ -15,6 +15,10 @@ class Options(
     namedtuple("Options", "fn_or_terminal,proportion,active")
 ):
 
+    @staticmethod
+    def create(fn_or_terminal):
+        return Options(fn_or_terminal, proportion=1, active=False)
+
     def calculate_terminal(self, width, height):
         if isinstance(self.fn_or_terminal, Terminal):
             return self.fn_or_terminal
@@ -37,63 +41,63 @@ class Split(Terminal):
     ...     TextFragment(x=0, y=1, text="3333333333"),
     ... ])
 
-    >>> SplitIntoRows.project([
-    ...     Options(lambda width, height: SplitIntoColumns.project([
+    >>> SplitIntoRows.project(6, 2, [
+    ...     Options(lambda width, height: SplitIntoColumns.project(width, height, [
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=width, height=height), 1, True),
+    ...     ]), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=6, height=2).print_ascii_layout()
+    ... ]).print_ascii_layout()
     111222
     333333
 
-    >>> SplitIntoRows.project([
-    ...     Options(lambda width, height: SplitIntoRows.project([
+    >>> SplitIntoRows.project(4, 4, [
+    ...     Options(lambda width, height: SplitIntoRows.project(width, height, [
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=width, height=height), 1, True),
+    ...     ]), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=4).print_ascii_layout()
+    ... ]).print_ascii_layout()
     1111
     2222
     3333
     3333
 
-    >>> SplitIntoRows.project([
-    ...     Options(lambda width, height: SplitIntoColumns.project([
+    >>> SplitIntoRows.project(4, 6, [
+    ...     Options(lambda width, height: SplitIntoColumns.project(width, height, [
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=width, height=height), 1, True),
+    ...     ]), 1, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=6).print_ascii_layout()
+    ... ]).print_ascii_layout()
     1122
     1122
     <BLANKLINE>
     3333
     3333
 
-    >>> SplitIntoRows.project([
-    ...     Options(lambda width, height: SplitIntoColumns.project([
+    >>> SplitIntoRows.project(4, 6, [
+    ...     Options(lambda width, height: SplitIntoColumns.project(width, height, [
     ...         Options(terminal1, 1, True),
     ...         Options(terminal2, 1, False),
-    ...     ], width=width, height=height), 0, True),
+    ...     ]), 0, True),
     ...     Options(terminal3, 1, False),
-    ... ], width=4, height=6).print_ascii_layout()
+    ... ]).print_ascii_layout()
     1122
     1122
     3333
     3333
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(3, 3, [
     ...     Options(terminal1, 0, True),
     ...     Options(terminal2, 0, False),
-    ... ], width=3, height=3).print_ascii_layout()
+    ... ]).print_ascii_layout()
     111
     111
     222
     222
 
-    >>> one_space_two = lambda width, height: SplitIntoColumns.project([
+    >>> one_space_two = lambda width, height: SplitIntoColumns.project(width, height, [
     ...     Options(
     ...         Terminal.create(fragments=[TextFragment(x=0, y=0, text="1")]),
     ...         0,
@@ -109,12 +113,12 @@ class Split(Terminal):
     ...         0,
     ...         False
     ...     ),
-    ... ], width=width, height=height)
+    ... ])
 
     >>> one_space_two(5, 5).print_ascii_layout()
     1***2
 
-    >>> SplitIntoColumns.project([
+    >>> SplitIntoColumns.project(10, 10, [
     ...     Options(
     ...         one_space_two,
     ...         1,
@@ -125,10 +129,10 @@ class Split(Terminal):
     ...         1,
     ...         False
     ...     ),
-    ... ], width=10, height=10).print_ascii_layout()
+    ... ]).print_ascii_layout()
     1***2x
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(5, 5, [
     ...     Options(
     ...         one_space_two,
     ...         0,
@@ -144,7 +148,7 @@ class Split(Terminal):
     ...         1,
     ...         False
     ...     ),
-    ... ], width=5, height=5).print_ascii_layout()
+    ... ]).print_ascii_layout()
     1***2
     x
     <BLANKLINE>
@@ -152,7 +156,7 @@ class Split(Terminal):
     """
 
     @classmethod
-    def project(cls, options, height, width):
+    def project(cls, width, height, options):
         builder = TextFragmentsBuilder()
         offset = 0
         active = None
@@ -179,7 +183,7 @@ class Split(Terminal):
                 active = terminal
         return SplitIntoRows(*Terminal.create(
             fragments=builder.get(),
-            cursors=active.cursors
+            cursors=active.cursors if active else []
         )).replace_meta(Meta(active_terminal=active))
 
     def size_event(self, event):
@@ -202,20 +206,20 @@ class SplitIntoRows(Split):
 
     I lay out terminal windows vertically:
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(10, 6, [
     ...     Options(terminal1, 1, True),
     ...     Options(terminal2, 1, False),
-    ... ], 6, 10).print_fragments_and_cursors()
+    ... ]).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=3, text='two one', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=4, text='two two', bold=None, bg=None, fg=None)
     Cursor(x=0, y=0)
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(10, 5, [
     ...     Options(terminal1, 0, True),
     ...     Options(terminal2, 1, False),
-    ... ], 5, 10).print_fragments_and_cursors()
+    ... ]).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=2, text='two one', bold=None, bg=None, fg=None)
@@ -224,20 +228,20 @@ class SplitIntoRows(Split):
 
     I clip terminals that do not fit:
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(10, 2, [
     ...     Options(terminal1, 1, True),
     ...     Options(terminal2, 1, False),
-    ... ], 2, 10).print_fragments_and_cursors()
+    ... ]).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=1, text='two one', bold=None, bg=None, fg=None)
     Cursor(x=0, y=0)
 
     Only cursors from the active terminal is shown:
 
-    >>> SplitIntoRows.project([
+    >>> SplitIntoRows.project(10, 4, [
     ...     Options(terminal1, 1, True),
     ...     Options(terminal2, 1, False),
-    ... ], 4, 10).print_fragments_and_cursors()
+    ... ]).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='one one', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=1, text='one two', bold=None, bg=None, fg=None)
     TextFragment(x=0, y=2, text='two one', bold=None, bg=None, fg=None)
@@ -273,10 +277,10 @@ class SplitIntoColumns(Split):
 
     I lay out terminal windows in columns:
 
-    >>> SplitIntoColumns.project([
-    ...     Options(terminal1, 0, True),
-    ...     Options(terminal2, 0, False),
-    ... ], 6, 1).print_fragments_and_cursors()
+    >>> SplitIntoColumns.project(6, 1, [
+    ...     Options.create(terminal1),
+    ...     Options.create(terminal2),
+    ... ]).print_fragments_and_cursors()
     TextFragment(x=0, y=0, text='111', bold=None, bg=None, fg=None)
     TextFragment(x=3, y=0, text='222', bold=None, bg=None, fg=None)
     """
