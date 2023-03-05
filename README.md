@@ -30,6 +30,14 @@ editing operations for different data structures.
 
 [How should I evolve the design of my projectional editor?](http://rickardlindberg.me/writing/evolving-design-of-projectional-editor/)
 
+### 2022-02-26
+
+I work on the split algorithm using TDD to help me.
+
+[How TDD helps me solve programming problems.](https://youtu.be/_uB1KGPjJjw)
+
+[![How TDD helps me solve programming problems.](https://img.youtube.com/vi/_uB1KGPjJjw/maxresdefault.jpg)](https://youtu.be/_uB1KGPjJjw "How TDD helps me solve programming problems.")
+
 ## Inspiration
 
 My first inspiration for this projects is
